@@ -23,125 +23,85 @@ use Illuminate\Support\Facades\DB;
 class AdminController extends Controller
 {
     
-    public function index(Request $request)
+    public function index()
     {
-        // Conteo general
-        $conteoVehiculos = Vehiculo::count();
-        $conteoPersonas = Persona::count();
-        $conteoOrdenes = Orden::count();
+        // Total de combustible consumido (solo órdenes activas)
+        $combustibleConsumido = DetalleOrden::from('detalle_orden')
+        ->where('detalle_orden.activo', 1)
+        ->whereHas('ordenes', function ($query) {
+            $query->where('orden.activo', 1);
+        })
+        ->sum('cantidad');
     
-        // Órdenes solicitadas y entregadas
-        $conteoOrdenesSolicitadas = Orden::where('activo', 1)->count();
-        $conteoOrdenesEntregadas = RelacionOrdenDetalle::where('entregado', true)
-            ->distinct('orden_id')
-            ->count('orden_id');
     
-        // Nuevas: Relaciones no entregadas (para mostrar en tabla interactiva)
-        $relacionesNoEntregadas = RelacionOrdenDetalle::with([
-            'detalleOrden.vehiculo',
-            'detalleOrden.chofer',
-            'detalleOrden.combustible',
+    
+        // Total de vehículos activos
+        $vehiculosActivos = Vehiculo::where('activo', 1)->count();
+    
+        // Últimos registros de carga (detalle de orden con relaciones)
+        $ultimasCargas = DetalleOrden::with([
+            'vehiculo',
+            'chofer',
+            'combustible',
+            'ordenes.gasolinera'
         ])
-        ->where('entregado', false)
-        ->where('activo', 1)
+        ->where('detalle_orden.activo', 1) // 👈 aquí está bien
+        ->whereHas('ordenes', function ($query) {
+            $query->where('orden.activo', 1); // 👈 especificar tabla
+        })
+        ->latest()
+        ->take(5)
         ->get();
     
-        // Órdenes solicitadas por día
-        $ordenesPorDia = Orden::selectRaw('DATE(fecha) as dia, COUNT(*) as total')
-            ->where('activo', 1)
-            ->groupBy('dia')
-            ->orderBy('dia')
-            ->get();
     
-        // Entregas por día
-        $entregasPorDia = RelacionOrdenDetalle::selectRaw('DATE(fecha_entrega) as dia, COUNT(DISTINCT orden_id) as total')
-            ->where('entregado', true)
-            ->groupBy('dia')
-            ->orderBy('dia')
-            ->get();
+        // Datos para gráfico mensual de consumo (solo usando Eloquent)
+        $consumoMensual = DetalleOrden::where('detalle_orden.activo', 1) // 👈 aquí también
+        ->whereHas('ordenes', function ($query) {
+            $query->where('orden.activo', 1); // 👈 importante
+        })
+        ->with('ordenes')
+        ->get()
+        ->flatMap(function ($detalle) {
+            return $detalle->ordenes->map(function ($orden) use ($detalle) {
+                return [
+                    'mes' => \Carbon\Carbon::parse($orden->fecha)->format('m'),
+                    'cantidad' => $detalle->cantidad,
+                ];
+            });
+        })
+        ->groupBy('mes')
+        ->map(function ($items) {
+            return $items->sum('cantidad');
+        })
+        ->sortKeys();
+
+        $combustibleSolicitado = RelacionOrdenDetalle::where('activo', 1)
+        ->with('detalleOrden') // Carga la relación detalleOrden
+        ->get() // Obtén todos los resultados
+        ->sum(function($relacion) {
+            return $relacion->detalleOrden->cantidad; // Accede a la cantidad de la relación
+        });
     
-        // Combustible solicitado
-        $combustibleSolicitado = DetalleOrden::where('activo', 1)
-            ->selectRaw('
-                SUM(CASE WHEN medida = "Litros" THEN cantidad ELSE 0 END) as totalLitrosSolicitados,
-                SUM(CASE WHEN medida = "Galones" THEN cantidad ELSE 0 END) as totalGalonesSolicitados
-            ')
-            ->first();
     
-        // Combustible entregado
-        $combustibleEntregado = RelacionOrdenDetalle::selectRaw('
-                SUM(CASE WHEN detalle_orden.medida = "Litros" THEN detalle_orden.cantidad ELSE 0 END) as totalLitrosEntregados,
-                SUM(CASE WHEN detalle_orden.medida = "Galones" THEN detalle_orden.cantidad ELSE 0 END) as totalGalonesEntregados
-            ')
-            ->join('detalle_orden', 'detalle_orden.id', '=', 'relacion_orden_detalle.detalle_orden_id')
-            ->where('relacion_orden_detalle.activo', 1)
-            ->where('relacion_orden_detalle.entregado', true)
-            ->where('detalle_orden.activo', 1)
-            ->first();
+        $combustibleEntregado = RelacionOrdenDetalle::where('activo', 1)
+        ->where('entregado', true)
+        ->with('detalleOrden') // Carga la relación detalleOrden
+        ->get() // Obtén todos los resultados
+        ->map(function($relacion) {
+            return $relacion->detalleOrden->cantidad; // Extrae la cantidad de cada relación
+        })
+        ->sum(); // Suma todas las cantidades
     
-        // Combustible solicitado por día
-        $combustibleSolicitadoPorDia = Orden::selectRaw('
-                DATE(fecha) as dia,
-                SUM(CASE WHEN detalle_orden.medida = "Litros" THEN detalle_orden.cantidad ELSE 0 END) as totalLitrosSolicitados,
-                SUM(CASE WHEN detalle_orden.medida = "Galones" THEN detalle_orden.cantidad ELSE 0 END) as totalGalonesSolicitados
-            ')
-            ->join('relacion_orden_detalle', 'relacion_orden_detalle.orden_id', '=', 'orden.id')
-            ->join('detalle_orden', 'detalle_orden.id', '=', 'relacion_orden_detalle.detalle_orden_id')
-            ->where('orden.activo', 1)
-            ->groupBy('dia')
-            ->orderBy('dia')
-            ->get();
     
-        // Combustible entregado por día
-        $combustibleEntregadoPorDia = RelacionOrdenDetalle::selectRaw('
-                DATE(fecha_entrega) as dia,
-                SUM(CASE WHEN detalle_orden.medida = "Litros" THEN detalle_orden.cantidad ELSE 0 END) as totalLitrosEntregados,
-                SUM(CASE WHEN detalle_orden.medida = "Galones" THEN detalle_orden.cantidad ELSE 0 END) as totalGalonesEntregados
-            ')
-            ->join('detalle_orden', 'detalle_orden.id', '=', 'relacion_orden_detalle.detalle_orden_id')
-            ->join('orden', 'orden.id', '=', 'relacion_orden_detalle.orden_id')
-            ->where('relacion_orden_detalle.entregado', true)
-            ->where('relacion_orden_detalle.activo', 1)
-            ->where('detalle_orden.activo', 1)
-            ->where('orden.activo', 1)
-            ->groupBy('dia')
-            ->orderBy('dia')
-            ->get();
-    
-        // Datos para gráficos
-        $diasSolicitados = $ordenesPorDia->pluck('dia')->toArray();
-        $totalesSolicitados = $ordenesPorDia->pluck('total')->toArray();
-    
-        $diasEntregados = $entregasPorDia->pluck('dia')->toArray();
-        $totalesEntregados = $entregasPorDia->pluck('total')->toArray();
-    
-        $diasCombustibleSolicitado = $combustibleSolicitadoPorDia->pluck('dia')->toArray();
-        $litrosSolicitadosPorDia = $combustibleSolicitadoPorDia->pluck('totalLitrosSolicitados')->toArray();
-        $galonesSolicitadosPorDia = $combustibleSolicitadoPorDia->pluck('totalGalonesSolicitados')->toArray();
-    
-        $diasCombustibleEntregado = $combustibleEntregadoPorDia->pluck('dia')->toArray();
-        $litrosEntregadosPorDia = $combustibleEntregadoPorDia->pluck('totalLitrosEntregados')->toArray();
-        $galonesEntregadosPorDia = $combustibleEntregadoPorDia->pluck('totalGalonesEntregados')->toArray();
-    
-        $litrosSolicitados = $combustibleSolicitado->totalLitrosSolicitados ?? 0;
-        $galonesSolicitados = $combustibleSolicitado->totalGalonesSolicitados ?? 0;
-        $litrosEntregados = $combustibleEntregado->totalLitrosEntregados ?? 0;
-        $galonesEntregados = $combustibleEntregado->totalGalonesEntregados ?? 0;
-    
-        return view('admin.dashboard', compact(
-            'conteoVehiculos', 'conteoPersonas', 'conteoOrdenes',
-            'conteoOrdenesSolicitadas', 'conteoOrdenesEntregadas',
-            'diasSolicitados', 'totalesSolicitados',
-            'diasEntregados', 'totalesEntregados',
-            'diasCombustibleSolicitado', 'litrosSolicitadosPorDia', 'galonesSolicitadosPorDia',
-            'diasCombustibleEntregado', 'litrosEntregadosPorDia', 'galonesEntregadosPorDia',
-            'litrosSolicitados', 'galonesSolicitados',
-            'litrosEntregados', 'galonesEntregados',
-            'relacionesNoEntregadas' // <-- Este es nuevo
+        return view('admin.dashboard.dashboard', compact(
+            'combustibleConsumido',
+            'vehiculosActivos',
+            'ultimasCargas',
+            'consumoMensual',
+            'combustibleSolicitado', 
+            'combustibleEntregado',
         ));
     }
-    
-    
     
         /**
      * Exporta las órdenes entregadas a Excel filtradas por rango de fechas.

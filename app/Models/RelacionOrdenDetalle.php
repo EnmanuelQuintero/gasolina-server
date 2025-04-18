@@ -1,5 +1,5 @@
 <?php
-
+ 
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
@@ -13,8 +13,16 @@ class RelacionOrdenDetalle extends Model
 
     protected $fillable = [
         'activo',
+        'entregado',
+        'fecha_entrega',
         'orden_id',
         'detalle_orden_id',
+    ];
+
+    protected $casts = [
+        'entregado' => 'boolean',       
+        'activo' => 'boolean',
+        'fecha_entrega' => 'date',
     ];
 
     public function orden()
@@ -24,6 +32,7 @@ class RelacionOrdenDetalle extends Model
 
     public function detalleOrden()
     {
-        return $this->belongsTo(DetalleOrden::class);
+        return $this->belongsTo(DetalleOrden::class, 'detalle_orden_id');
     }
+    
 }

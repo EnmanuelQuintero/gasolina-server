@@ -39,4 +39,6 @@ class DetalleOrden extends Model
     {
         return $this->belongsToMany(Orden::class, 'relacion_orden_detalle', 'detalle_orden_id', 'orden_id');
     }
+
+
 }
