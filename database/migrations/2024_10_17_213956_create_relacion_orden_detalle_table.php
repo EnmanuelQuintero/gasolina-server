@@ -1,37 +1,32 @@
 <?php
 
-namespace App\Models;
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-
-class RelacionOrdenDetalle extends Model
+return new class extends Migration
 {
-    use HasFactory;
-
-    protected $table = 'relacion_orden_detalle';
-
-    protected $fillable = [
-        'activo',
-        'entregado',
-        'fecha_entrega',
-        'orden_id',
-        'detalle_orden_id',
-    ];
-
-    protected $casts = [
-        'entregado' => 'boolean',
-        'activo' => 'boolean',
-        'fecha_entrega' => 'date',
-    ];
-
-    public function orden()
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
     {
-        return $this->belongsTo(Orden::class);
+        Schema::create('relacion_orden_detalle', function (Blueprint $table) {
+            $table->id();
+            $table->boolean('activo')->default(true);
+            $table->boolean('entregado')->default(false); // Nuevo campo booleano
+            $table->date('fecha_entrega')->nullable(); // Nuevo campo fecha, puede ser nulo
+            $table->foreignId('orden_id')->constrained('orden')->onUpdate('cascade')->onDelete('cascade');
+            $table->foreignId('detalle_orden_id')->constrained('detalle_orden')->onUpdate('cascade')->onDelete('cascade');
+            $table->timestamps();
+        });
     }
 
-    public function detalleOrden()
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
     {
-        return $this->belongsTo(DetalleOrden::class);
+        Schema::dropIfExists('relacion_orden_detalle');
     }
-}
+};
