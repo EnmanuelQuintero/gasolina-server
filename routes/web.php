@@ -14,7 +14,7 @@ use App\Http\Controllers\Catalogos\PersonaController;
 //controlador de orden
 use App\Http\Controllers\QRController;
 use App\Http\Controllers\Orden\OrdenController;
-
+use App\Http\Controllers\ReporteController;
 //controlador prueba
 use App\Http\Controllers\Dashboard\AdminController;
 use App\Http\Controllers\GraficoController;
@@ -52,7 +52,7 @@ Route::group(['middleware' => ['role:admin']], function () {
     Route::post('/vehiculos/{id}/toggle-activo', [CatalogoVehiculosController::class, 'toggleActivo']);
     Route::post('/personas/{id}/toggle-activo', [PersonaController::class, 'toggleActivo']);
 })->middleware('auth');;
-Route::get('/grafico-ordenes', [GraficoController::class, 'obtenerDatosGrafico']);
+
 //Rutas de la orden
 Route::group(['middleware' => ['role:admin|operador']], function () {
     
@@ -77,21 +77,20 @@ Route::group(['middleware' => ['role:admin|operador']], function () {
     
     
     //Rutas Reportes
+    Route::get('/reportes', [ReporteController::class, 'index'])->name('reportes.index');
+    Route::post('/reportes/ver', [ReporteController::class, 'ver'])->name('reportes.ver');
+    Route::get('/reportes/ver', [ReporteController::class, 'pdf'])->name('reportes.ver');
 
-    Route::get('/consolidado/{startDate}/{endDate}',[AdminController::class,'verConsolidado'])->name('consolidado.ver');
-    Route::get('/pdf/consolidado/{startDate}/{endDate}', [InformeController::class, 'generarReporte'])->name('report.pdf');
-    Route::get('/excel/consolidado/{startDate}/{endDate}', [InformeController::class, 'generarExcel'])->name('report.excel');
-
-
-    Route::get('/pdf/solicitadas/{startDate}/{endDate}',[InformeController::class,'generarReporteSolicitadas'])->name('report.solicitadas.pdf');
-    Route::get('/pdf/entregadas/{startDate}/{endDate}',[InformeController::class,'generarReporteEntregadas'])->name('report.entregadas.pdf');
-
-    Route::get('/excel/solicitadas/{startDate}/{endDate}',[InformeController::class,'generarExcelSolicitadas'])->name('report.solicitadas.excel');
-    Route::get('/excel/entregadas/{startDate}/{endDate}',[InformeController::class,'generarExcelEntregadas'])->name('report.entregadas.excel');
+    Route::post('/reportes/pdf', [ReporteController::class, 'pdf'])->name('reportes.pdf');
+    Route::post('/reportes/excel', [ReporteController::class, 'excel'])->name('reportes.excel');
 
 
-    Route::get('/ver/solicitadas/{startDate}/{endDate}',[InformeController::class,'verReporteSolicitadas'])->name('ver.solicitadas.pdf');
-    Route::get('/ver/entregadas/{startDate}/{endDate}',[InformeController::class,'verReporteEntregadas'])->name('ver.entregadas.pdf');
+    // Reportes avanzados
+    Route::get('/reportes/avanzado', [ReporteController::class, 'reporteAvanzadoForm'])->name('reportes.avanzado.form');
+    Route::post('/reportes/avanzado/ver', [ReporteController::class, 'reporteAvanzadoVer'])->name('reportes.avanzado.ver');
+    Route::post('/reportes/avanzado/pdf', [ReporteController::class, 'reporteAvanzadoPDF'])->name('reportes.avanzado.pdf');
+
+    Route::get('/reportes/opciones/{tipo}', [ReporteController::class, 'cargarOpciones']);
 
 });
 

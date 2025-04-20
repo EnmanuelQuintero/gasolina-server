@@ -9,6 +9,14 @@
         <span class="mr-4">Dashboard - Control de Combustible</span> 
         
     </h1>
+    <a href="{{ route('reportes.avanzado.form') }}" class="btn btn-success">
+        <i class="fas fa-filter"></i> Reporte Avanzado
+    </a>
+
+    <a href="{{ route('reportes.index') }}"
+        class="inline-block bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded transition duration-200">
+        📄 Ver Reportes de Órdenes
+    </a>
 
     {{-- Tarjetas de resumen --}}
     @include('admin.dashboard.partials.resumen')

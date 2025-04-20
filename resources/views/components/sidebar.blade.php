@@ -112,13 +112,7 @@
                 </div>
             </li>
 
-            <li>
-                <div class="flex items-center gap-3 p-3 text-white transition rounded-lg hover:bg-blue-700">
-                <img src="{{asset('/images/iconos/informe.png')}}" alt="" class="w-6 h-6" style="filter: invert(1);">
 
-                    @include('components.partials.modalInforme')
-                </div>
-            </li>
             @endrole
 
 

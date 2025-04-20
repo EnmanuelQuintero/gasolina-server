@@ -35,4 +35,11 @@ class Orden extends Model
     {
         return $this->belongsToMany(DetalleOrden::class, 'relacion_orden_detalle', 'orden_id', 'detalle_orden_id');
     }
+    
+    public function relaciones()
+    {
+        return $this->hasMany(RelacionOrdenDetalle::class, 'orden_id');
+    }
+    
+
 }
