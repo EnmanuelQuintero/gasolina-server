@@ -1,26 +1,90 @@
-@extends('layouts.dash')
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Reporte Avanzado</title>
+    <style>
+        @page {
+            margin: 160px 25px 80px 25px;
+        }
 
-@section('content')
-<form action="{{ route('reportes.avanzado.pdf') }}" method="POST">
-    @csrf
-    <input type="hidden" name="fecha_inicio" value="{{ $request->fecha_inicio }}">
-    <input type="hidden" name="fecha_fin" value="{{ $request->fecha_fin }}">
-    <input type="hidden" name="filtro" value="{{ $filtro }}">
+        body {
+            font-family: sans-serif;
+            font-size: 12px;
+            margin: 0;
+        }
 
-    @if($filtro === 'gasolinera')
-        <input type="hidden" name="gasolinera_id" value="{{ $request->gasolinera_id }}">
-    @elseif($filtro === 'persona')
-        <input type="hidden" name="persona_id" value="{{ $request->persona_id }}">
-    @elseif($filtro === 'vehiculo')
-        <input type="hidden" name="vehiculo_id" value="{{ $request->vehiculo_id }}">
-    @endif
+        header {
+            position: fixed;
+            top: -140px;
+            left: 0; right: 0;
+            height: 140px;
+        }
 
-    <button type="submit">Descargar PDF</button>
-</form>
+        footer {
+            position: fixed;
+            bottom: -60px;
+            left: 0; right: 0;
+            height: 60px;
+            text-align: center;
+        }
 
+        .header-table {
+            width: 100%;
+            border: none;
+        }
 
+        .header-center h1, .header-center h2, .header-center p {
+            margin: 0; padding: 0;
+        }
 
-@foreach($agrupadas as $grupo => $items)
+        table.data {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        table.data th, table.data td {
+            border: 1px solid #000;
+            padding: 5px;
+        }
+
+        table.data th {
+            background-color: #f2f2f2;
+        }
+
+        .grupo-header {
+            background-color: #dfe6e9;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <table class="header-table">
+        <tr>
+            <td width="15%">
+                <img src="{{ public_path('/images/alcaldialeon.png') }}" style="width:50px; height:70px;">
+            </td>
+            <td class="header-center" style="text-align:center;">
+                <h1>Alcaldía Municipal de León</h1>
+                <h2>Reporte Avanzado por {{ ucfirst($filtro) }}</h2>
+                <p><strong>Desde:</strong> {{ $request->fecha_inicio }} &nbsp;&nbsp; <strong>Hasta:</strong> {{ $request->fecha_fin }}</p>
+            </td>
+            <td width="15%" style="text-align:right;">
+                <img src="{{ public_path('/images/escudo.png') }}" style="width:70px; height:70px;">
+            </td>
+        </tr>
+    </table>
+</header>
+
+<footer>
+    <img src="{{ public_path('/images/logo_pie.webp') }}" style="width:220px; height:60px;">
+</footer>
+
+<main>
+    @foreach($agrupadas as $grupo => $items)
         <table class="data">
             <thead>
             <tr class="grupo-header">
@@ -97,4 +161,7 @@
 
         </table>
     @endforeach
-@endsection
+</main>
+
+</body>
+</html>

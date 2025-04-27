@@ -70,7 +70,7 @@
             <td class="header-center" style="text-align:center;">
                 <h1>Alcaldía Municipal de León</h1>
                 <h2>Reporte Avanzado por {{ ucfirst($filtro) }}</h2>
-                <p><strong>Desde:</strong> {{ $request->fecha_inicio }} &nbsp;&nbsp; <strong>Hasta:</strong> {{ $request->fecha_fin }}</p>
+                <p><strong>Desde:</strong> {{ $fecha_inicio }} &nbsp;&nbsp; <strong>Hasta:</strong> {{ $fecha_fin }}</p>
             </td>
             <td width="15%" style="text-align:right;">
                 <img src="{{ public_path('/images/escudo.png') }}" style="width:70px; height:70px;">
@@ -87,12 +87,23 @@
     @foreach($agrupadas as $grupo => $items)
         <table class="data">
             <thead>
-                <tr class="grupo-header">
-                    <td colspan="7">{{ ucfirst($filtro) }}: {{ $grupo }}</td>
-                </tr>
+            <tr class="grupo-header">
+                <td colspan="5">
+                    @if($filtro === 'vehiculo')
+                        @php $orden = $items->first()->orden ?? null; @endphp
+                    @else
+                        @php $orden = $items->first(); @endphp
+                    @endif
+
+                    @if($orden)
+                        Orden #{{ $orden->id }} - {{ $orden->fecha }} - 
+                        {{ $orden->gasolinera->nombre ?? 'N/D' }}
+                    @endif
+                </td>
+            </tr>
+
                 <tr>
-                    <th># Orden</th>
-                    <th>Fecha</th>
+
                     <th>Vehículo</th>
                     <th>Chofer</th>
                     <th>Combustible</th>
@@ -104,8 +115,7 @@
     @if($filtro === 'vehiculo')
         @foreach($items as $rel)
             <tr>
-                <td>{{ $rel->orden_id }}</td>
-                <td>{{ $rel->orden->fecha }}</td>
+
                 <td>{{ $rel->detalleOrden->vehiculo->placa }}</td>
                 <td>{{ $rel->detalleOrden->chofer->primer_nombre }} {{ $rel->detalleOrden->chofer->primer_apellido }}</td>
                 <td>{{ $rel->detalleOrden->combustible->nombre }}</td>
@@ -127,8 +137,7 @@
         @foreach($items as $orden)
             @foreach($orden->relaciones as $rel)
                 <tr>
-                    <td>{{ $orden->id }}</td>
-                    <td>{{ $orden->fecha }}</td>
+
                     <td>{{ $rel->detalleOrden->vehiculo->placa }}</td>
                     <td>{{ $rel->detalleOrden->chofer->primer_nombre }} {{ $rel->detalleOrden->chofer->primer_apellido }}</td>
                     <td>{{ $rel->detalleOrden->combustible->nombre }}</td>

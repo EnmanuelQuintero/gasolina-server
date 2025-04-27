@@ -87,7 +87,8 @@ Route::group(['middleware' => ['role:admin|operador']], function () {
 
     // Reportes avanzados
     Route::get('/reportes/avanzado', [ReporteController::class, 'reporteAvanzadoForm'])->name('reportes.avanzado.form');
-    Route::post('/reportes/avanzado/ver', [ReporteController::class, 'reporteAvanzadoVer'])->name('reportes.avanzado.ver');
+    Route::match(['get', 'post'], '/reportes/avanzado/ver', [ReporteController::class, 'reporteAvanzadoVer']);
+
     Route::post('/reportes/avanzado/pdf', [ReporteController::class, 'reporteAvanzadoPDF'])->name('reportes.avanzado.pdf');
 
     Route::get('/reportes/opciones/{tipo}', [ReporteController::class, 'cargarOpciones']);

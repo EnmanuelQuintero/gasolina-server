@@ -3,7 +3,7 @@
 @section('content')
 <div class="max-w-3xl mx-auto px-4 py-8 bg-white rounded-lg shadow">
     <h2 class="text-2xl font-semibold mb-6">Reporte Avanzado de Órdenes</h2>
-    <form action="{{ route('reportes.avanzado.ver') }}" method="POST">
+    <form action="/reportes/avanzado/ver" method="POST">
         @csrf
 
         {{-- Fecha Inicio --}}
