@@ -57,8 +57,11 @@
                 class="mt-1 block w-full border border-gray-300 dark:bg-gray-700 dark:text-gray-200 bg-white rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" 
                 required>
                 @foreach ($personas as $persona)
-                    <option value="{{ $persona->id }}">{{ $persona->primer_nombre }} {{ $persona->primer_apellido }}</option>
+                    @if ($persona->autorizado == 1)
+                        <option value="{{ $persona->id }}">{{ $persona->primer_nombre }} {{ $persona->primer_apellido }}</option>
+                    @endif
                 @endforeach
+
             </select>
             
             <!-- Descripción con popover -->
@@ -119,14 +122,15 @@
             </div>
 
             <div class="flex items-center space-x-6 mt-2">
-                <label class="flex items-center">
-                    <input type="radio" name="medida" value="Litros" class="text-blue-600 focus:ring-blue-500">
-                    <span class="ml-2 text-gray-700 dark:text-gray-300">Litros</span>
-                </label>
-                <label class="flex items-center">
-                    <input type="radio" name="medida" value="Galones" class="text-blue-600 focus:ring-blue-500">
-                    <span class="ml-2 text-gray-700 dark:text-gray-300">Galones</span>
-                </label>
+            <label class="flex items-center">
+                <input type="radio" name="medida" value="Litros" required class="text-blue-600 focus:ring-blue-500">
+                <span class="ml-2 text-gray-700 dark:text-gray-300">Litros</span>
+            </label>
+            <label class="flex items-center">
+                <input type="radio" name="medida" value="Galones" class="text-blue-600 focus:ring-blue-500">
+                <span class="ml-2 text-gray-700 dark:text-gray-300">Galones</span>
+            </label>
+
             </div>
         </div>
 
@@ -188,9 +192,12 @@
 
                                 <select name="detalles[0][id_chofer]" class="block w-full bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-200 border rounded-md mt-2">
                                     @foreach ($personas as $persona)
-                                        <option value="{{ $persona->id }}">{{ $persona->primer_nombre }} {{ $persona->primer_apellido }}</option>
+                                        @if ($persona->chofer == 1)
+                                            <option value="{{ $persona->id }}">{{ $persona->primer_nombre }} {{ $persona->primer_apellido }}</option>
+                                        @endif
                                     @endforeach
                                 </select>
+
                             </td>
 
 
@@ -300,12 +307,15 @@
                         @endforeach
                     </select>
                 </td>
+
                 <td class="px-4 py-2">
                     <select name="detalles[${detailIndex}][id_chofer]" 
                         class="block w-full bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-200 border rounded-md">
                         @foreach ($personas as $persona)
-                            <option value="{{ $persona->id }}">{{ $persona->primer_nombre }} {{ $persona->primer_apellido }}</option>
-                        @endforeach
+                            @if ($persona->chofer == 1)
+                                <option value="{{ $persona->id }}">{{ $persona->primer_nombre }} {{ $persona->primer_apellido }}</option>
+                            @endif
+                            @endforeach
                     </select>
                 </td>
                 <td class="px-4 py-2">

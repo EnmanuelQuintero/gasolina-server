@@ -18,12 +18,13 @@ class Persona extends Model
         'primer_apellido',
         'segundo_apellido',
         'departamento_cargo_id',
-
+        'cedula',
+        'autorizado',
+        'chofer',
     ];
 
     public function departamentoCargo()
     {
         return $this->belongsTo(RelacionDepartamentoCargo::class, 'departamento_cargo_id');
     }
-
 }

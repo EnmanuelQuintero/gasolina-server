@@ -126,6 +126,13 @@
             document.getElementById('editar_segundo_nombre').value = persona.segundo_nombre || '';
             document.getElementById('editar_primer_apellido').value = persona.primer_apellido || '';
             document.getElementById('editar_segundo_apellido').value = persona.segundo_apellido || '';
+            document.getElementById('editar_cedula').value = persona.cedula || '';
+
+            // Checkboxes: true/false
+            document.getElementById('editar_autorizado').checked = persona.autorizado == 1 || persona.autorizado === true;
+            document.getElementById('editar_chofer').checked = persona.chofer == 1 || persona.chofer === true;
+
+
             document.getElementById('editar_departamento_cargo_id').value = persona.departamento_cargo_id || '';
             document.getElementById('editarPersonaModal').classList.remove('invisible'); // Cambiar a 'editarPersonaModal'
         }

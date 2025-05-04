@@ -44,8 +44,27 @@
 
             <!-- Segundo Apellido -->
             <div class="mb-4">
-                <label for="editar_segundo_apellido" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Segundo Apellido</label>
-                <input type="text" name="segundo_apellido" id="editar_segundo_apellido" value="{{ $persona->segundo_apellido }}" class="mt-1 block w-full border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                <label for="segundo_apellido" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Segundo Apellido</label>
+                <input type="text" name="segundo_apellido" id="editar_segundo_apellido" class="mt-1 block w-full border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 dark:focus:ring-blue-500 dark:focus:border-blue-500">
+            </div>
+
+
+            <!-- Cédula (opcional) -->
+            <div class="mb-4">
+                <label for="cedula" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Cédula</label>
+                <input type="text" name="cedula" id="editar_cedula" class="mt-1 block w-full border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 dark:focus:ring-blue-500 dark:focus:border-blue-500">
+            </div>
+
+            <!-- Checkbox: Autorizado -->
+            <div class="mb-4 flex items-center">
+                <input type="checkbox" name="autorizado" id="editar_autorizado" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded dark:bg-gray-700 dark:border-gray-600">
+                <label for="autorizado" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">Autorizado</label>
+            </div>
+
+            <!-- Checkbox: Chofer -->
+            <div class="mb-4 flex items-center">
+                <input type="checkbox" name="chofer" id="editar_chofer" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded dark:bg-gray-700 dark:border-gray-600">
+                <label for="chofer" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">Chofer</label>
             </div>
 
             <!-- Área -->
