@@ -1,59 +1,80 @@
-APP_NAME=Laravel
-APP_ENV=local
-APP_KEY=base64:C3y7Cmbszxuu3lLG/5W9BBjcSTIShfGrsz6iAmYBQac=
-APP_DEBUG=true
-APP_URL=http://localhost
+Claro, aquí tienes un `README.md` que documenta las versiones de los paquetes utilizados en tu proyecto Laravel:
 
-LOG_CHANNEL=stack
-LOG_DEPRECATIONS_CHANNEL=null
-LOG_LEVEL=debug
+---
 
-DB_CONNECTION=mysql
-DB_HOST=127.0.0.1
-DB_PORT=3306
-DB_DATABASE=combustible
-DB_USERNAME=root
-DB_PASSWORD=
+# 📦 Laravel Project - Dependencias y Versiones
 
-BROADCAST_DRIVER=log
-CACHE_DRIVER=file
-FILESYSTEM_DISK=local
-QUEUE_CONNECTION=sync
-SESSION_DRIVER=file
-SESSION_LIFETIME=120
+Este proyecto está basado en **Laravel** y utiliza una variedad de paquetes para extender su funcionalidad. A continuación se detallan las versiones utilizadas, tanto en producción como en desarrollo.
 
-MEMCACHED_HOST=127.0.0.1
+---
 
-REDIS_HOST=127.0.0.1
-REDIS_PASSWORD=null
-REDIS_PORT=6379
+## 🧱 Requisitos Principales
 
-MAIL_MAILER=smtp
-MAIL_HOST=mailpit
-MAIL_PORT=1025
-MAIL_USERNAME=null
-MAIL_PASSWORD=null
-MAIL_ENCRYPTION=null
-MAIL_FROM_ADDRESS="hello@example.com"
-MAIL_FROM_NAME="${APP_NAME}"
+* **PHP**: `^8.1`
+* **Laravel Framework**: `^10.10`
 
-AWS_ACCESS_KEY_ID=
-AWS_SECRET_ACCESS_KEY=
-AWS_DEFAULT_REGION=us-east-1
-AWS_BUCKET=
-AWS_USE_PATH_STYLE_ENDPOINT=false
+---
 
-PUSHER_APP_ID=
-PUSHER_APP_KEY=
-PUSHER_APP_SECRET=
-PUSHER_HOST=
-PUSHER_PORT=443
-PUSHER_SCHEME=https
-PUSHER_APP_CLUSTER=mt1
+## 📦 Dependencias de Producción (`require`)
 
-VITE_APP_NAME="${APP_NAME}"
-VITE_PUSHER_APP_KEY="${PUSHER_APP_KEY}"
-VITE_PUSHER_HOST="${PUSHER_HOST}"
-VITE_PUSHER_PORT="${PUSHER_PORT}"
-VITE_PUSHER_SCHEME="${PUSHER_SCHEME}"
-VITE_PUSHER_APP_CLUSTER="${PUSHER_APP_CLUSTER}"
+| Paquete                          | Versión | Descripción                                                 |
+| -------------------------------- | ------- | ----------------------------------------------------------- |
+| `asdh/laravel-flatpickr`         | `^2.2`  | Integración de Flatpickr (selector de fechas) para Laravel. |
+| `barryvdh/laravel-dompdf`        | `^2.2`  | Generación de PDFs usando DOMPDF.                           |
+| `consoletvs/charts`              | `6.*`   | Generación de gráficos para dashboards y reportes.          |
+| `dompdf/dompdf`                  | `^2.0`  | Librería principal para renderizar PDFs desde HTML/CSS.     |
+| `guzzlehttp/guzzle`              | `^7.2`  | Cliente HTTP para hacer peticiones a APIs externas.         |
+| `laravel/sanctum`                | `^3.3`  | Autenticación ligera para APIs y SPA.                       |
+| `laravel/tinker`                 | `^2.8`  | REPL para ejecutar código Laravel desde la consola.         |
+| `league/commonmark`              | `2.6`   | Conversor de Markdown a HTML.                               |
+| `league/csv`                     | `^9.16` | Manejo avanzado de archivos CSV.                            |
+| `maatwebsite/excel`              | `^3.1`  | Importación/exportación de archivos Excel.                  |
+| `phpoffice/phpspreadsheet`       | `^1.29` | Manipulación de hojas de cálculo (XLSX, ODS, etc).          |
+| `simplesoftwareio/simple-qrcode` | `^4.2`  | Generación de códigos QR.                                   |
+| `spatie/laravel-permission`      | `^6.9`  | Gestión de roles y permisos basada en Spatie.               |
+
+---
+
+## 🛠️ Dependencias de Desarrollo (`require-dev`)
+
+| Paquete                   | Versión  | Descripción                                              |
+| ------------------------- | -------- | -------------------------------------------------------- |
+| `fakerphp/faker`          | `^1.9.1` | Generador de datos falsos para pruebas.                  |
+| `laravel/pint`            | `^1.0`   | Formateador de código automático para Laravel.           |
+| `laravel/sail`            | `^1.18`  | Entorno de desarrollo Dockerizado para Laravel.          |
+| `mockery/mockery`         | `^1.4.4` | Librería para crear objetos falsos en pruebas unitarias. |
+| `nunomaduro/collision`    | `^7.0`   | Mejora la visualización de errores en la consola.        |
+| `phpunit/phpunit`         | `^10.1`  | Framework de testing para PHP.                           |
+| `spatie/laravel-ignition` | `^2.0`   | Página de errores con contexto mejorado para Laravel.    |
+
+---
+
+## ⚙️ Configuraciones adicionales
+
+* **Autoload** con `PSR-4` para:
+
+  * App: `app/`
+  * Factories: `database/factories/`
+  * Seeders: `database/seeders/`
+
+* **Scripts de Composer**:
+
+  * Generación de llave de aplicación.
+  * Descubrimiento automático de paquetes.
+  * Publicación de assets de Laravel tras actualizaciones.
+
+* **Stabilidad mínima**: `stable`
+
+* **Preferencia por versiones estables**: `true`
+
+---
+
+## 📌 Notas
+
+* Este proyecto está preparado para usarse con Laravel 10 y PHP 8.1 o superior.
+* Incluye soporte para generación de documentos (PDF, Excel), autenticación, permisos, gráficos y más.
+* El entorno de desarrollo puede ser fácilmente configurado con Laravel Sail si se requiere.
+
+---
+
+¿Quieres que incluya instrucciones de instalación y configuración también?
