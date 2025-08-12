@@ -21,9 +21,10 @@
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 18L18 6M6 6l12 12"/></svg>
             </button>
         </div>
-        <form id="editPersonaForm" action="{{ route('personas.update', $persona->id) }}" method="POST" class="px-10">
-    @csrf
-    @method('PUT')
+        <form id="editPersonaForm" method="POST" class="px-10">
+
+        @csrf
+        @method('PUT')
             <!-- Primer Nombre -->
             <div class="mb-4">
                 <label for="editar_primer_nombre" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Primer Nombre</label>

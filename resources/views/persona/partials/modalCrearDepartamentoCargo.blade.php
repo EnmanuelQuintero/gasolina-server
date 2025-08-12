@@ -119,24 +119,29 @@
         }
 
     </script>
+<script>
+    const updatePersonaRouteTemplate = "/personas/__ID__";
+</script>
+
     <script>
-        function openModalPersona(persona) {
-            document.getElementById('modalTitle').innerText = 'Editar Persona';
-            document.getElementById('editar_primer_nombre').value = persona.primer_nombre || '';
-            document.getElementById('editar_segundo_nombre').value = persona.segundo_nombre || '';
-            document.getElementById('editar_primer_apellido').value = persona.primer_apellido || '';
-            document.getElementById('editar_segundo_apellido').value = persona.segundo_apellido || '';
-            document.getElementById('editar_cedula').value = persona.cedula || '';
+    function openModalPersona(persona) {
+        // Actualiza los valores de los campos como ya lo haces
+        document.getElementById('modalTitle').innerText = 'Editar Persona';
+        document.getElementById('editar_primer_nombre').value = persona.primer_nombre || '';
+        document.getElementById('editar_segundo_nombre').value = persona.segundo_nombre || '';
+        document.getElementById('editar_primer_apellido').value = persona.primer_apellido || '';
+        document.getElementById('editar_segundo_apellido').value = persona.segundo_apellido || '';
+        document.getElementById('editar_cedula').value = persona.cedula || '';
+        document.getElementById('editar_autorizado').checked = persona.autorizado == 1 || persona.autorizado === true;
+        document.getElementById('editar_chofer').checked = persona.chofer == 1 || persona.chofer === true;
+        document.getElementById('editar_departamento_cargo_id').value = persona.departamento_cargo_id || '';
 
-            // Checkboxes: true/false
-            document.getElementById('editar_autorizado').checked = persona.autorizado == 1 || persona.autorizado === true;
-            document.getElementById('editar_chofer').checked = persona.chofer == 1 || persona.chofer === true;
+        // 👇 Actualiza la acción del formulario con el ID correcto
+        const form = document.getElementById('editPersonaForm');
+        form.action = updatePersonaRouteTemplate.replace('__ID__', persona.id);
 
-
-            document.getElementById('editar_departamento_cargo_id').value = persona.departamento_cargo_id || '';
-            document.getElementById('editarPersonaModal').classList.remove('invisible'); // Cambiar a 'editarPersonaModal'
-        }
-
+        document.getElementById('editarPersonaModal').classList.remove('invisible');
+    }
         function closeModalEditarPersona() {
             document.getElementById('editarPersonaModal').classList.add('invisible');
         }

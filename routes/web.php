@@ -48,6 +48,8 @@ Route::group(['middleware' => ['role:admin']], function () {
     Route::resource('catalogo-combustibles', CatalogoCombustiblesController::class);
     // Rutas de recurso para personas
     Route::resource('personas', PersonaController::class);
+    Route::put('/personas/{persona}', [PersonaController::class, 'update'])->name('personas.update');
+
     Route::get('/catalogo-vehiculos/{id}', [CatalogoVehiculosController::class, 'show']);
     Route::post('/vehiculos/{id}/toggle-activo', [CatalogoVehiculosController::class, 'toggleActivo']);
     Route::post('/personas/{id}/toggle-activo', [PersonaController::class, 'toggleActivo']);
