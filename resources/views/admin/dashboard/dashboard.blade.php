@@ -9,15 +9,22 @@
         <span class="mr-4">Dashboard - Control de Combustible</span> 
         
     </h1>
-    <a href="{{ route('reportes.avanzado.form') }}" class="btn btn-success">
-        <i class="fas fa-filter"></i> Reporte Avanzado
-    </a>
-
-    <a href="{{ route('reportes.index') }}"
-        class="inline-block bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded transition duration-200">
-        📄 Ver Reportes de Órdenes
-    </a>
-
+    <div class="flex flex-col sm:flex-row sm:items-center sm:space-x-4 space-y-2 sm:space-y-0 mb-10">
+        <!-- Botón: Reporte Avanzado -->
+        <a href="{{ route('reportes.avanzado.form') }}"
+           class="inline-flex items-center bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg transition duration-200 shadow-sm">
+            <i class="fas fa-filter mr-2"></i>
+            Reporte Avanzado
+        </a>
+    
+        <!-- Botón: Ver Reportes de Órdenes -->
+        <a href="{{ route('reportes.index') }}"
+           class="inline-flex items-center bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg transition duration-200 shadow-sm">
+            <i class="fas fa-file-alt mr-2"></i>
+            Ver Reportes de Órdenes
+        </a>
+    </div>
+    
     {{-- Tarjetas de resumen --}}
     @include('admin.dashboard.partials.resumen')
 

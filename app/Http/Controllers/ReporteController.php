@@ -184,8 +184,6 @@ class ReporteController extends Controller
 
     public function reporteAvanzadoPDF(Request $request)
     {
-
-
         $request->validate([
             'fecha_inicio' => 'required|date',
             'fecha_fin' => 'required|date|after_or_equal:fecha_inicio',
@@ -193,7 +191,7 @@ class ReporteController extends Controller
         ]);
     
         $filtro = $request->filtro;
-        //dd($filtro);
+    
         // Base query
         $ordenes = Orden::with([
             'gasolinera',
@@ -201,10 +199,10 @@ class ReporteController extends Controller
             'detalles.vehiculo',
             'detalles.chofer',
             'detalles.combustible',
-        ])
-        ->whereBetween('fecha', [$request->fecha_inicio, $request->fecha_fin]);
-        
-        // Filtro adicional por ID
+            'relaciones.detalleOrden.vehiculo',
+        ])->whereBetween('fecha', [$request->fecha_inicio, $request->fecha_fin]);
+    
+        // Filtros por tipo
         switch ($filtro) {
             case 'gasolinera':
                 $request->validate(['gasolinera_id' => 'required|exists:gasolineras,id']);
@@ -213,39 +211,37 @@ class ReporteController extends Controller
     
             case 'persona':
                 $request->validate(['persona_id' => 'required|exists:personas,id']);
-            
                 $ordenes->where(function ($query) use ($request) {
                     $query->where('autorizado_id', $request->persona_id)
-                            ->orWhereHas('relaciones.detalleOrden', function ($subquery) use ($request) {
-                                $subquery->where('chofer_id', $request->persona_id);
-                            });
+                          ->orWhereHas('relaciones.detalleOrden', function ($subquery) use ($request) {
+                              $subquery->where('chofer_id', $request->persona_id);
+                          });
                 });
                 break;
     
             case 'vehiculo':
                 $request->validate(['vehiculo_id' => 'required|exists:vehiculos,id']);
-                //dd($request);
-                $ordenes->flatMap(function ($orden) {
-                    return $orden->relaciones->filter(fn($rel) => $rel->detalleOrden?->vehiculo !== null);
+                $ordenes->whereHas('relaciones.detalleOrden', function ($query) use ($request) {
+                    $query->where('vehiculo_id', $request->vehiculo_id);
                 });
-                //dd($ordenes);
                 break;
         }
     
+        // Ejecutar consulta
         $ordenes = $ordenes->get();
-        //dd($ordenes);
+    
         // Agrupación
         $agrupadas = match ($filtro) {
             'gasolinera' => $ordenes->groupBy(fn($orden) =>
                 $orden->gasolinera->nombre ?? 'N/D'
             ),
-        
+    
             'persona' => $ordenes->filter(fn($orden) =>
                 $orden->autorizado !== null
             )->groupBy(fn($orden) =>
                 ($orden->autorizado->primer_nombre ?? '') . ' ' . ($orden->autorizado->primer_apellido ?? '')
             ),
-        
+    
             'vehiculo' => $ordenes->flatMap(function ($orden) {
                 return $orden->relaciones->filter(fn($rel) =>
                     $rel->detalleOrden?->vehiculo !== null
@@ -253,20 +249,19 @@ class ReporteController extends Controller
             })->groupBy(fn($rel) =>
                 $rel->detalleOrden->vehiculo->placa ?? 'N/D'
             ),
-        
+    
             default => collect()
         };
-        
+    
         $pdf = Pdf::loadView('reportes.seccionado.pdf', [
             'agrupadas' => $agrupadas,
             'filtro' => $filtro,
             'fecha_inicio' => $request->fecha_inicio,
             'fecha_fin' => $request->fecha_fin,
         ]);
-        
+    
         return $pdf->download('reportes-seleccionado.pdf');
-        
-
     }
+    
 
 }
