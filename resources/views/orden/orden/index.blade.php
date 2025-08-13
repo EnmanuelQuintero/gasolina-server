@@ -47,51 +47,5 @@
 @section('scripts')
     <script src="{{ asset('/js/imprimir_orden.js') }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/simple-datatables@9.0.3"></script>
-<script>
-    
-    if (document.getElementById("filter-table") && typeof simpleDatatables.DataTable !== 'undefined') {
-    const dataTable = new simpleDatatables.DataTable("#filter-table", {
-        tableRender: (_data, table, type) => {
-            if (type === "print") {
-                return table;
-            }
-
-            const tHead = table.childNodes[0];
-            const filterHeaders = {
-                nodeName: "TR",
-                attributes: {
-                    class: "search-filtering-row"
-                },
-                childNodes: tHead.childNodes[0].childNodes.map((_th, index) => {
-                    // Excluir el tercer input (índice 2)
-                    if (index === 3) {
-                        return { nodeName: "TH", childNodes: [] }; // Retorna vacío para el tercer input
-                    }
-
-                    return {
-                        nodeName: "TH",
-                        childNodes: [
-                            {
-                                nodeName: "INPUT",
-                                attributes: {
-                                    class: "datatable-input",
-                                    type: "search",
-                                    "data-columns": "[" + index + "]"
-                                }
-                            }
-                        ]
-                    };
-                })
-            };
-
-            // Insertar los filtros en el encabezado
-            tHead.childNodes.push(filterHeaders);
-            return table;
-        }
-    });
-}
-
-
-</script>
 
 @endsection

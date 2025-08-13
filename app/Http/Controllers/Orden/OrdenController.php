@@ -23,17 +23,21 @@ class OrdenController extends Controller
 
 public function index(Request $request)
 {
-    
-    //dd($request->all());
-    $ordenes = Orden::all();
-    $detalles = DetalleOrden::all();
-    if (isset($request->search) ) {
-        $ordenes = Orden::where('token', $request->search)->get();
-        dd($ordenes);
+    $ordenesQuery = Orden::with(['relacionDetalles', 'gasolinera'])->orderBy('fecha', 'desc');
+
+    if ($request->filled('search')) {
+        $ordenesQuery->where('token', $request->search);
     }
-    // Retorna la vista con las órdenes filtradas, buscadas y ordenadas
-    return view('orden.orden.index', compact('ordenes', 'detalles'));
+
+    $ordenes = $ordenesQuery->get();
+    $detalles = DetalleOrden::all(); // Asegura que esta línea esté presente
+
+    $entregadas = $ordenes->filter(fn($orden) => $orden->relacionDetalles->contains('entregado', true));
+    $pendientes = $ordenes->filter(fn($orden) => !$orden->relacionDetalles->contains('entregado', true));
+
+    return view('orden.orden.index', compact('entregadas', 'pendientes', 'ordenes', 'detalles'));
 }
+
 
 
 
