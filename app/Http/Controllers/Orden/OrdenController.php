@@ -23,21 +23,31 @@ class OrdenController extends Controller
 
 public function index(Request $request)
 {
-    $ordenesQuery = Orden::with(['relacionDetalles', 'gasolinera'])->orderBy('fecha', 'desc');
+    $ordenesQuery = Orden::with(['relacionDetalles', 'gasolinera'])
+                         ->orderBy('fecha', 'desc');
 
+    // Filtro por token
     if ($request->filled('search')) {
         $ordenesQuery->where('token', $request->search);
     }
 
-    $ordenes = $ordenesQuery->get();
-    $detalles = DetalleOrden::all(); // Asegura que esta línea esté presente
+    // Filtro por gasolinera
+    if ($request->filled('gasolinera')) {
+        $ordenesQuery->where('gasolinera_id', $request->gasolinera);
+    }
 
+    $ordenes = $ordenesQuery->get();
+    $detalles = DetalleOrden::all();
+
+    // Agrupar por entregadas y pendientes
     $entregadas = $ordenes->filter(fn($orden) => $orden->relacionDetalles->contains('entregado', true));
     $pendientes = $ordenes->filter(fn($orden) => !$orden->relacionDetalles->contains('entregado', true));
 
-    return view('orden.orden.index', compact('entregadas', 'pendientes', 'ordenes', 'detalles'));
-}
+    // Obtener todas las gasolineras
+    $gasolineras = Gasolinera::all();
 
+    return view('orden.orden.index', compact('entregadas', 'pendientes', 'ordenes', 'detalles', 'gasolineras'));
+}
 
 
 

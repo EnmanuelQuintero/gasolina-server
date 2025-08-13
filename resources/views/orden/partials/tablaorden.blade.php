@@ -33,13 +33,14 @@
                         @endif
 
                         @role('admin')
-                            <!-- Editar -->
-                            <a href="{{ route('orden.edit', $orden->id) }}"
-                                class="bg-blue-500 hover:bg-blue-600 text-white rounded-lg p-2"
-                                title="Editar">
-                                <img src="{{ asset('/images/iconos/lapiz.png') }}" class="h-4" alt="Editar">
-                            </a>
-
+                            @if ($mostrarEntregar)
+                                <!-- Editar -->
+                                <a href="{{ route('orden.edit', $orden->id) }}"
+                                    class="bg-blue-500 hover:bg-blue-600 text-white rounded-lg p-2"
+                                    title="Editar">
+                                    <img src="{{ asset('/images/iconos/lapiz.png') }}" class="h-4" alt="Editar">
+                                </a>
+                            @endif
                             <!-- Activar/Eliminar -->
                             <form action="{{ route('orden.estado', $orden->id) }}" method="POST" onsubmit="return confirm('¿Estás seguro?')">
                                 @csrf
