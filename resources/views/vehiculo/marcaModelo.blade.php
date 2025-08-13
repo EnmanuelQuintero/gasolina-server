@@ -32,6 +32,12 @@
             <option value="{{ $color }}" {{ request('color') == $color ? 'selected' : '' }}>{{ $color }}</option>
         @endforeach
     </select>
+    <select name="estado" class="px-4 py-2 border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+        <option value="">Todos los estados</option>
+        <option value="operativo" {{ request('estado') == 'operativo' ? 'selected' : '' }}>Operativo</option>
+        <option value="taller" {{ request('estado') == 'taller' ? 'selected' : '' }}>En taller</option>
+        <option value="baja" {{ request('estado') == 'baja' ? 'selected' : '' }}>De baja</option>
+    </select>
 
     <button type="submit"
         class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition duration-200">

@@ -11,6 +11,7 @@
             data-tipo="{{ $vehiculo->tipo }}"
             data-modelo="{{ $vehiculo->relacion_marca_modelo_id }}"
             data-activo="{{ $vehiculo->activo }}"
+            data-estado="{{ $vehiculo->estado }}"
             class="flex items-center justify-center p-2.5 bg-yellow-500 hover:bg-yellow-600 text-white rounded-full transition-all duration-300 shadow-md"
         >
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -93,6 +94,17 @@
                     <label for="edit_placa" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Placa</label>
                     <input type="text" name="placa" id="edit_placa" class="block w-full mt-1 p-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300" required>
                     @error('placa')
+                        <div class="text-red-600 mt-1">{{ $message }}</div>
+                    @enderror
+                </div>
+                <div class="mb-4">
+                    <label for="edit_estado" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Estado</label>
+                    <select id="edit_estado" name="estado" class="block w-full mt-1 p-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300" required>
+                        <option value="operativo">Operativo</option>
+                        <option value="taller">En taller</option>
+                        <option value="baja">De baja</option>
+                    </select>
+                    @error('estado')
                         <div class="text-red-600 mt-1">{{ $message }}</div>
                     @enderror
                 </div>

@@ -144,7 +144,7 @@
         document.getElementById('edit_color').value = color;
         document.getElementById('edit_relacion_marca_modelo_id').value = modelo;
         document.getElementById('edit_activo').checked = activo == 1;
-
+        document.getElementById('edit_estado').value = button.dataset.estado;
         // Actualizar la acción del formulario
         const form = document.getElementById('editVehicleForm');
         form.action = `/catalogo-vehiculos/${id}`; // Asegúrate que esta ruta sea correcta

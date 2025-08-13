@@ -116,68 +116,74 @@ public function index(Request $request)
     }
     
 
-    public function update(Request $request, $id)
-    {
-        // Muestra los datos recibidos
-        //dd($request->all());
-    
-        // Encuentra el vehículo por ID
-        $vehiculo = Vehiculo::findOrFail($id);
-    
-        // Validación condicional
-        $validationRules = [];
-    
-        if ($request->has('tipo')) {
-            $validationRules['tipo'] = 'string|max:255';
-        }
-    
-        if ($request->has('relacion_marca_modelo_id')) {
-            $validationRules['relacion_marca_modelo_id'] = 'exists:relacion_marca_modelo,id';
-        }
-    
-        if ($request->has('color')) {
-            $validationRules['color'] = 'string|max:50';
-        }
-    
-        if ($request->has('placa')) {
-            $validationRules['placa'] = 'string|max:10|unique:vehiculos,placa,'.$id;
-        }
-    
-        if ($request->has('activo')) {
-            $validationRules['activo'] = 'boolean';
-        }
-    
-        // Valida los datos de entrada según las reglas construidas
-        $request->validate($validationRules);
-    
-        // Actualiza solo los campos que fueron enviados en la solicitud
-        if ($request->has('tipo')) {
-            $vehiculo->tipo = $request->tipo;
-        }
-    
-        if ($request->has('relacion_marca_modelo_id')) {
-            $vehiculo->relacion_marca_modelo_id = $request->relacion_marca_modelo_id;
-        }
-    
-        if ($request->has('color')) {
-            $vehiculo->color = $request->color;
-        }
-    
-        if ($request->has('placa')) {
-            $vehiculo->placa = $request->placa;
-        }
-    
-        if ($request->has('activo')) {
-            $vehiculo->activo = $request->activo ? 1 : 0; // Convierte el checkbox a un valor booleano
-        }
-    
-        // Guarda los cambios en la base de datos
-        $vehiculo->save();
-    
-        // Redirecciona a donde necesites (por ejemplo, al índice de vehículos)
-        return redirect()->route('modelos-vehiculos.index')->with('success', 'Vehículo actualizado correctamente.');
+public function update(Request $request, $id)
+{
+    // Encuentra el vehículo por ID
+    $vehiculo = Vehiculo::findOrFail($id);
+
+    // Validación condicional
+    $validationRules = [];
+
+    if ($request->has('tipo')) {
+        $validationRules['tipo'] = 'string|max:255';
     }
-    
+
+    if ($request->has('relacion_marca_modelo_id')) {
+        $validationRules['relacion_marca_modelo_id'] = 'exists:relacion_marca_modelo,id';
+    }
+
+    if ($request->has('color')) {
+        $validationRules['color'] = 'string|max:50';
+    }
+
+    if ($request->has('placa')) {
+        $validationRules['placa'] = 'string|max:10|unique:vehiculos,placa,'.$id;
+    }
+
+    if ($request->has('activo')) {
+        $validationRules['activo'] = 'boolean';
+    }
+
+    // ✅ Validar el campo estado si viene en la request
+    if ($request->has('estado')) {
+        $validationRules['estado'] = 'in:operativo,taller,baja';
+    }
+
+    // Validación
+    $request->validate($validationRules);
+
+    // Actualiza solo los campos presentes
+    if ($request->has('tipo')) {
+        $vehiculo->tipo = $request->tipo;
+    }
+
+    if ($request->has('relacion_marca_modelo_id')) {
+        $vehiculo->relacion_marca_modelo_id = $request->relacion_marca_modelo_id;
+    }
+
+    if ($request->has('color')) {
+        $vehiculo->color = $request->color;
+    }
+
+    if ($request->has('placa')) {
+        $vehiculo->placa = $request->placa;
+    }
+
+    if ($request->has('activo')) {
+        $vehiculo->activo = $request->activo ? 1 : 0;
+    }
+
+    // ✅ Asignación del nuevo campo
+    if ($request->has('estado')) {
+        $vehiculo->estado = $request->estado;
+    }
+
+    // Guarda los cambios
+    $vehiculo->save();
+
+    return redirect()->route('modelos-vehiculos.index')->with('success', 'Vehículo actualizado correctamente.');
+}
+
     public function toggleActivo($id)
     {
         // Encuentra el vehículo por ID

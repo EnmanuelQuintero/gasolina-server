@@ -6,6 +6,7 @@
                 <th class="px-4 py-2 text-left">Tipo</th>
                 <th class="px-4 py-2 text-left">Color</th>
                 <th class="px-4 py-2 text-left">Marca</th>
+                <th class="px-4 py-2 text-left">Estado</th> <!-- Nueva columna -->
                 <th class="px-4 py-2 text-left">Modelo / Acciones</th>
             </tr>
         </thead>
@@ -16,6 +17,9 @@
                     <td class="px-4 py-2 border-b border-gray-300">{{ $vehiculo->tipo }}</td>
                     <td class="px-4 py-2 border-b border-gray-300">{{ $vehiculo->color }}</td>
                     <td class="px-4 py-2 border-b border-gray-300">{{ $vehiculo->marcaModelo->marca->nombre ?? '—' }}</td>
+                    <td class="px-4 py-2 border-b border-gray-300 capitalize">
+                        {{ $vehiculo->estado }}
+                    </td>
                     <td class="px-4 py-2 border-b border-gray-300">
                         <div class="flex items-center justify-between gap-4">
                             <!-- Modelo -->
@@ -41,7 +45,7 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="5" class="text-center py-4 text-gray-500 dark:text-gray-400">No hay vehículos registrados.</td>
+                    <td colspan="6" class="text-center py-4 text-gray-500 dark:text-gray-400">No hay vehículos registrados.</td>
                 </tr>
             @endforelse
         </tbody>
