@@ -1,11 +1,31 @@
 <!-- Botón para Editar Vehículo -->
 <div class="relative inline-block text-left group">
     <!-- Botón de Editar Vehículo -->
-    <button onclick="openModalEditVehiculo({{ $vehiculo->id }})" class="flex p-2.5 bg-yellow-500 rounded-xl hover:rounded-3xl hover:bg-yellow-600 transition-all duration-300 text-white">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-        </svg>
-    </button>
+    <!-- Botón de Editar Vehículo -->
+    <div class="relative group">
+        <button
+            onclick="openModalEditVehiculo(this)"
+            data-id="{{ $vehiculo->id }}"
+            data-placa="{{ $vehiculo->placa }}"
+            data-color="{{ $vehiculo->color }}"
+            data-tipo="{{ $vehiculo->tipo }}"
+            data-modelo="{{ $vehiculo->relacion_marca_modelo_id }}"
+            data-activo="{{ $vehiculo->activo }}"
+            class="flex items-center justify-center p-2.5 bg-yellow-500 hover:bg-yellow-600 text-white rounded-full transition-all duration-300 shadow-md"
+        >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+            </svg>
+        </button>
+
+        <!-- Tooltip -->
+        <div class="absolute z-10 hidden group-hover:block w-32 text-xs text-center bg-gray-800 text-white py-1 px-2 rounded-md -top-10 left-1/2 transform -translate-x-1/2">
+            Editar vehículo
+        </div>
+    </div>
+
+
     <div class="absolute left-1/2 transform  -translate-x-1/2 z-10 hidden mt-2 w-48 rounded-md shadow-lg text-xs bg-white text-black p-2 group-hover:block">
         Edita un registro existente de Vehículo.
     </div>

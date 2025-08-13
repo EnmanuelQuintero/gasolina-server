@@ -123,72 +123,41 @@
     </script>
 
 <script src="https://cdn.jsdelivr.net/npm/simple-datatables@9.0.3"></script>
-<script>
-    
-if (document.getElementById("filter-table") && typeof simpleDatatables.DataTable !== 'undefined') {
-    const dataTable = new simpleDatatables.DataTable("#filter-table", {
-        tableRender: (_data, table, type) => {
-            if (type === "print") {
-                return table
-            }
-            const tHead = table.childNodes[0]
-            const filterHeaders = {
-                nodeName: "TR",
-                attributes: {
-                    class: "search-filtering-row"
-                },
-                childNodes: tHead.childNodes[0].childNodes.map(
-                    (_th, index) => ({nodeName: "TH",
-                        childNodes: [
-                            {
-                                nodeName: "INPUT",
-                                attributes: {
-                                    class: "datatable-input",
-                                    type: "search",
-                                    "data-columns": "[" + index + "]"
-                                }
-                            }
-                        ]})
-                )
-            }
-            tHead.childNodes.push(filterHeaders)
-            return table
-        }
-    });
-}
-
-</script>
 
 
 <script>
-function openModalEditVehiculo(id) {
-    fetch(`/catalogo-vehiculos/${id}`)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.json();
-        })
-        .then(vehiculo => {
-            // Rellena los campos del modal con los datos del vehículo
-            document.getElementById('edit_vehiculo_id').value = vehiculo.id; // ID corregido
-            document.getElementById('edit_tipo').value = vehiculo.tipo; // Tipo corregido
-            document.getElementById('edit_relacion_marca_modelo_id').value = vehiculo.relacion_marca_modelo_id; // Marca-Modelo corregido
-            document.getElementById('edit_color').value = vehiculo.color; // Color corregido
-            document.getElementById('edit_placa').value = vehiculo.placa; // Placa corregido
-            document.getElementById('edit_activo').checked = vehiculo.activo == 1; // Checkbox
+    function openModalEditVehiculo(button) {
+        const modal = document.getElementById('editVehicleModal');
 
-            // Muestra el modal
-            document.getElementById('editVehicleModal').classList.remove('invisible');
-        })
-        .catch(error => console.error('Error:', error)); // Maneja errores
-}
-// Función para cerrar el modal
-function closeModalEditVehiculo() {
-    // Oculta el modal
-    document.getElementById('editVehicleModal').classList.add('invisible');
-}
+        // Obtener valores desde los atributos data-*
+        const id = button.getAttribute('data-id');
+        const placa = button.getAttribute('data-placa');
+        const tipo = button.getAttribute('data-tipo');
+        const color = button.getAttribute('data-color');
+        const modelo = button.getAttribute('data-modelo');
+        const activo = button.getAttribute('data-activo');
+
+        // Llenar los campos del formulario
+        document.getElementById('edit_vehiculo_id').value = id;
+        document.getElementById('edit_placa').value = placa;
+        document.getElementById('edit_tipo').value = tipo;
+        document.getElementById('edit_color').value = color;
+        document.getElementById('edit_relacion_marca_modelo_id').value = modelo;
+        document.getElementById('edit_activo').checked = activo == 1;
+
+        // Actualizar la acción del formulario
+        const form = document.getElementById('editVehicleForm');
+        form.action = `/catalogo-vehiculos/${id}`; // Asegúrate que esta ruta sea correcta
+
+        // Mostrar el modal
+        modal.classList.remove('invisible');
+    }
+
+    function closeModalEditVehiculo() {
+        document.getElementById('editVehicleModal').classList.add('invisible');
+    }
 </script>
+
 
 <script>
     function toggleActivo(vehiculoId) {
