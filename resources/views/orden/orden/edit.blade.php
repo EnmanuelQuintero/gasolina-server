@@ -83,9 +83,11 @@
                                     
                                     <option value=""></option>
                                     @foreach ($vehiculos as $vehiculo)
-                                        <option value="{{ $vehiculo->id }}" {{ $vehiculo->placa == $detalle->detalleOrden->vehiculo->placa ? 'selected' : '' }}>
-                                            {{ $vehiculo->placa }}
-                                        </option>
+                                        @if ($vehiculo->estado === 'operativo')
+                                            <option value="{{ $vehiculo->id }}" {{ $vehiculo->placa == $detalle->detalleOrden->vehiculo->placa ? 'selected' : '' }}>
+                                                {{ $vehiculo->placa }}
+                                            </option>
+                                        @endif
                                     @endforeach
                                 </select>
                             </td>
@@ -137,7 +139,9 @@
                 <td>
                     <select name="detalles[${detailIndex}][numero_placa]" class="form-control dark:bg-gray-800 dark:text-white text-black bg-white">
                         @foreach ($vehiculos as $vehiculo)
-                            <option value="{{ $vehiculo->id }}">{{ $vehiculo->placa }}</option>
+                            @if ($vehiculo->estado === 'operativo')
+                                <option value="{{ $vehiculo->id }}">{{ $vehiculo->placa }}</option>
+                            @endif
                         @endforeach
                     </select>
                 </td>

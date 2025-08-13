@@ -169,9 +169,12 @@
 
                                 <select name="detalles[0][numero_placa]" class="block w-full bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-200 border rounded-md mt-2">
                                     @foreach ($vehiculos as $vehiculo)
-                                        <option value="{{ $vehiculo->id }}">{{ $vehiculo->placa }}</option>
+                                        @if ($vehiculo->estado === 'operativo')
+                                            <option value="{{ $vehiculo->id }}">{{ $vehiculo->placa }}</option>
+                                        @endif
                                     @endforeach
                                 </select>
+
                             </td>
 
                             <td class="px-4 py-2">
@@ -303,9 +306,12 @@
                     <select name="detalles[${detailIndex}][numero_placa]" 
                         class="block w-full bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-200 border rounded-md">
                         @foreach ($vehiculos as $vehiculo)
-                            <option value="{{ $vehiculo->id }}">{{ $vehiculo->placa }}</option>
+                            @if ($vehiculo->estado === 'operativo')
+                                <option value="{{ $vehiculo->id }}">{{ $vehiculo->placa }}</option>
+                            @endif
                         @endforeach
                     </select>
+
                 </td>
 
                 <td class="px-4 py-2">

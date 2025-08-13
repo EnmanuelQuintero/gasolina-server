@@ -8,7 +8,8 @@
 <!-- Agrega los estilos de Flatpickr -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 
-
+<!-- Agregar Font Awesome CDN en el head -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
 
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
 
@@ -89,6 +90,13 @@
     <main>
         <div class="grid justify-items-center espacios px-8 h-full w-full">
             <!-- Contenido Principal -->
+            <!-- Botón flotante -->
+            <button onclick="window.history.back()" 
+                    class="fixed top-5 right-5 p-4 bg-gray-800 text-white rounded-full shadow-lg hover:bg-gray-700 transition duration-300">
+                <i class="fas fa-arrow-left"></i> <!-- Icono de flecha hacia atrás -->
+            </button>
+
+
             @yield('content')
         </div>
     </main>

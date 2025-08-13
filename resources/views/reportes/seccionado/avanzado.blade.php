@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="max-w-3xl mx-auto px-4 py-8 bg-white rounded-lg shadow">
-    <h2 class="text-2xl font-semibold mb-6">Reporte Avanzado de Órdenes</h2>
+    <h2 class="text-2xl font-semibold mb-6">Reporte Especifico de Órdenes</h2>
     <form action="/reportes/avanzado/ver" method="POST">
         @csrf
 
@@ -30,7 +30,7 @@
                 required>
                 <option value="">Seleccione un filtro</option>
                 <option value="gasolinera">Gasolinera</option>
-                <option value="persona">Persona</option>
+                <option value="persona">Chofer</option>
                 <option value="vehiculo">Vehículo</option>
             </select>
         </div>

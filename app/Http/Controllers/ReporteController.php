@@ -103,84 +103,81 @@ class ReporteController extends Controller
         return view('reportes.seccionado.avanzado');
     }
 
-    public function reporteAvanzadoVer(Request $request)
-    {
-        $request->validate([
-            'fecha_inicio' => 'required|date',
-            'fecha_fin' => 'required|date|after_or_equal:fecha_inicio',
-            'filtro' => 'required|in:gasolinera,persona,vehiculo',
-        ]);
-    
-        $filtro = $request->filtro;
-        //dd($filtro);
-        // Base query
-        $ordenes = Orden::with([
-            'gasolinera',
-            'autorizado',
-            'relaciones.detalleOrden.vehiculo',
-            'relaciones.detalleOrden.chofer',
-            'relaciones.detalleOrden.combustible',
-        ])
-        ->whereBetween('fecha', [$request->fecha_inicio, $request->fecha_fin]);
-    
-        // Filtro adicional por ID
-        switch ($filtro) {
-            case 'gasolinera':
-                $request->validate(['gasolinera_id' => 'required|exists:gasolineras,id']);
-                $ordenes->where('gasolinera_id', $request->gasolinera_id);
-                break;
-    
-            case 'persona':
-                $request->validate(['persona_id' => 'required|exists:personas,id']);
-            
-                $ordenes->where(function ($query) use ($request) {
-                    $query->where('autorizado_id', $request->persona_id)
-                            ->orWhereHas('relaciones.detalleOrden', function ($subquery) use ($request) {
-                                $subquery->where('chofer_id', $request->persona_id);
-                            });
-                });
-                break;
-    
-            case 'vehiculo':
-                $request->validate(['vehiculo_id' => 'required|exists:vehiculos,id']);
-                //dd($request);
-                $ordenes->whereHas('relaciones.detalleOrden', function ($query) use ($request) {
-                    $query->where('vehiculo_id', $request->vehiculo_id);
-                });
-                //dd($ordenes);
-                break;
-        }
-    
-        $ordenes = $ordenes->get();
-        //dd($ordenes);
-        // Agrupación
-        $agrupadas = match ($filtro) {
-            'gasolinera' => $ordenes->groupBy(fn($orden) =>
-                $orden->gasolinera->nombre ?? 'N/D'
-            ),
-        
-            'persona' => $ordenes->filter(fn($orden) =>
-                $orden->autorizado !== null
-            )->groupBy(fn($orden) =>
-                ($orden->autorizado->primer_nombre ?? '') . ' ' . ($orden->autorizado->primer_apellido ?? '')
-            ),
-        
-            'vehiculo' => $ordenes->flatMap(function ($orden) {
-                return $orden->relaciones->filter(fn($rel) =>
-                    $rel->detalleOrden?->vehiculo !== null
-                );
-            })->groupBy(fn($rel) =>
-                $rel->detalleOrden->vehiculo->placa ?? 'N/D'
-            ),
-        
-            default => collect()
-        };
-        
+public function reporteAvanzadoVer(Request $request)
+{
+    $request->validate([
+        'fecha_inicio' => 'required|date',
+        'fecha_fin' => 'required|date|after_or_equal:fecha_inicio',
+        'filtro' => 'required|in:gasolinera,persona,vehiculo',
+    ]);
 
-        //dd($agrupadas);
-        return view('reportes.seccionado.avanzado_resultado', compact('agrupadas', 'filtro', 'request'));
+    $filtro = $request->filtro;
+
+    // Base query
+    $ordenes = Orden::with([
+        'gasolinera',
+        'autorizado',
+        'relaciones.detalleOrden.vehiculo',
+        'relaciones.detalleOrden.chofer',
+        'relaciones.detalleOrden.combustible',
+    ])
+    ->whereBetween('fecha', [$request->fecha_inicio, $request->fecha_fin]);
+
+    // Filtro adicional por ID
+    switch ($filtro) {
+        case 'gasolinera':
+            $request->validate(['gasolinera_id' => 'required|exists:gasolineras,id']);
+            $ordenes->where('gasolinera_id', $request->gasolinera_id);
+            break;
+
+        case 'persona':
+            $request->validate(['persona_id' => 'required|exists:personas,id']);
+            // Filtramos solo por chofer en las relaciones de detalleOrden
+            $ordenes->whereHas('relaciones.detalleOrden', function ($subquery) use ($request) {
+                $subquery->where('chofer_id', $request->persona_id);
+            });
+            break;
+
+        case 'vehiculo':
+            $request->validate(['vehiculo_id' => 'required|exists:vehiculos,id']);
+            
+            // Aseguramos que el filtro se aplica estrictamente al vehiculo_id
+            $ordenes->whereHas('relaciones.detalleOrden', function ($query) use ($request) {
+                // Aseguramos que solo se filtre por el vehiculo_id
+                $query->where('vehiculo_id', $request->vehiculo_id);  
+            });
+            break;
     }
-    
+
+    $ordenes = $ordenes->get();
+
+    // Agrupación
+    $agrupadas = match ($filtro) {
+        'gasolinera' => $ordenes->groupBy(fn($orden) =>
+            $orden->gasolinera->nombre ?? 'N/D'
+        ),
+
+        'persona' => $ordenes->filter(fn($orden) =>
+            $orden->autorizado !== null
+        )->groupBy(fn($orden) =>
+            ($orden->autorizado->primer_nombre ?? '') . ' ' . ($orden->autorizado->primer_apellido ?? '')
+        ),
+
+        'vehiculo' => $ordenes->flatMap(function ($orden) use ($request) {
+            return $orden->relaciones->filter(function ($rel) use ($request) {
+                // Filtramos solo las relaciones donde el vehiculo_id coincida
+                return $rel->detalleOrden?->vehiculo?->id == $request->vehiculo_id;
+            });
+        })->groupBy(fn($rel) =>
+            $rel->detalleOrden->vehiculo->placa ?? 'N/D'
+        ),
+
+        default => collect()
+    };
+
+    return view('reportes.seccionado.avanzado_resultado', compact('agrupadas', 'filtro', 'request'));
+}
+
 
     public function reporteAvanzadoPDF(Request $request)
     {
@@ -209,22 +206,24 @@ class ReporteController extends Controller
                 $ordenes->where('gasolinera_id', $request->gasolinera_id);
                 break;
     
-            case 'persona':
-                $request->validate(['persona_id' => 'required|exists:personas,id']);
-                $ordenes->where(function ($query) use ($request) {
-                    $query->where('autorizado_id', $request->persona_id)
-                          ->orWhereHas('relaciones.detalleOrden', function ($subquery) use ($request) {
-                              $subquery->where('chofer_id', $request->persona_id);
-                          });
-                });
-                break;
+        case 'persona':
+            $request->validate(['persona_id' => 'required|exists:personas,id']);
+
+            // Filtramos solo por chofer en las relaciones de detalleOrden
+            $ordenes->whereHas('relaciones.detalleOrden', function ($subquery) use ($request) {
+                $subquery->where('chofer_id', $request->persona_id);
+            });
+            break;
     
-            case 'vehiculo':
-                $request->validate(['vehiculo_id' => 'required|exists:vehiculos,id']);
-                $ordenes->whereHas('relaciones.detalleOrden', function ($query) use ($request) {
-                    $query->where('vehiculo_id', $request->vehiculo_id);
-                });
-                break;
+        case 'vehiculo':
+            $request->validate(['vehiculo_id' => 'required|exists:vehiculos,id']);
+            
+            // Aseguramos que el filtro se aplica estrictamente al vehiculo_id
+            $ordenes->whereHas('relaciones.detalleOrden', function ($query) use ($request) {
+                // Aseguramos que solo se filtre por el vehiculo_id
+                $query->where('vehiculo_id', $request->vehiculo_id);  
+            });
+            break;
         }
     
         // Ejecutar consulta
@@ -242,10 +241,11 @@ class ReporteController extends Controller
                 ($orden->autorizado->primer_nombre ?? '') . ' ' . ($orden->autorizado->primer_apellido ?? '')
             ),
     
-            'vehiculo' => $ordenes->flatMap(function ($orden) {
-                return $orden->relaciones->filter(fn($rel) =>
-                    $rel->detalleOrden?->vehiculo !== null
-                );
+        'vehiculo' => $ordenes->flatMap(function ($orden) use ($request) {
+            return $orden->relaciones->filter(function ($rel) use ($request) {
+                // Filtramos solo las relaciones donde el vehiculo_id coincida
+                return $rel->detalleOrden?->vehiculo?->id == $request->vehiculo_id;
+            });
             })->groupBy(fn($rel) =>
                 $rel->detalleOrden->vehiculo->placa ?? 'N/D'
             ),
