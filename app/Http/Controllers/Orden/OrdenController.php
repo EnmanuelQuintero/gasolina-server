@@ -112,13 +112,28 @@ public function index(Request $request)
         }
         //dd($relacionDetalleOrden);
         $gasolineras = Gasolinera::all();
+        $autorizados = Persona::where('autorizado', 1)->get();
+        $choferes = Persona::where('chofer', 1)->get();
         $personas = Persona::all();
+
         $vehiculos = Vehiculo::all();
         $combustibles = Combustible::all();
 
-        return view('orden.orden.edit', compact('medida','orden', 'gasolineras', 'personas', 'relacionDetalleOrden' ,'vehiculos', 'combustibles'));
+        return view('orden.orden.edit', compact(
+            'medida',
+            'orden',
+            'gasolineras',
+            'personas',
+            'autorizados',
+            'choferes',
+            'relacionDetalleOrden',
+            'vehiculos',
+            'combustibles'
+        ));
+
     }
-    // Actualiza una orden en el almacenamiento
+
+
     public function update(Request $request, $id)
     {
         $request->validate([
@@ -132,26 +147,38 @@ public function index(Request $request)
             'detalles.*.cantidad' => 'nullable|numeric',
             'detalles.*.medida' => 'nullable|string|in:Litros,Galones',
         ]);
-    
-        // Encuentra la orden que se va a actualizar
+
         $orden = Orden::findOrFail($id);
-    
-        // Actualiza los datos de la orden
+
+        // 1. Actualiza la orden
         $orden->update([
             'fecha' => $request->input('fecha'),
             'gasolinera_id' => $request->input('id_gasolinera'),
             'autorizado_id' => $request->input('id_autorizado'),
             'observaciones' => $request->input('observaciones'),
-            'activo' => 1, // Cambia esto según tu lógica
+            'activo' => 1,
         ]);
-    
-        // Obtén los detalles del request
+
         $detalles = $request->input('detalles', []);
-    
+
+        // 2. Obtiene los IDs de detalles que siguen existiendo
+        $idsExistentes = collect($detalles)->pluck('id')->filter()->all();
+
+        // 3. Elimina relaciones y detalles que ya no están
+        RelacionOrdenDetalle::where('orden_id', $orden->id)
+            ->whereHas('detalleOrden', function ($q) use ($idsExistentes) {
+                $q->whereNotIn('id', $idsExistentes);
+            })
+            ->each(function ($relacion) {
+                // Elimina la relación y el detalle
+                $relacion->detalleOrden->delete();
+                $relacion->delete();
+            });
+
+        // 4. Procesa cada detalle
         foreach ($detalles as $detalle) {
-            // Verifica si el detalle existe
             if (isset($detalle['id'])) {
-                // Actualiza el detalle existente
+                // Actualizar detalle existente
                 $detalleOrden = DetalleOrden::findOrFail($detalle['id']);
                 $detalleOrden->update([
                     'vehiculo_id' => $detalle['numero_placa'],
@@ -161,19 +188,25 @@ public function index(Request $request)
                     'medida' => $request->medida,
                 ]);
             } else {
-                // Crea un nuevo detalle si no se proporciona un ID
-                DetalleOrden::create([
+                // Crear nuevo detalle y su relación
+                $nuevoDetalle = DetalleOrden::create([
                     'vehiculo_id' => $detalle['numero_placa'],
                     'chofer_id' => $detalle['id_chofer'],
                     'combustible_id' => $detalle['id_combustible'],
                     'cantidad' => $detalle['cantidad'],
                     'medida' => $request->medida,
                 ]);
+
+                RelacionOrdenDetalle::create([
+                    'orden_id' => $orden->id,
+                    'detalle_orden_id' => $nuevoDetalle->id,
+                ]);
             }
         }
-    
+
         return redirect()->route('orden.index')->with('success', 'Orden actualizada con éxito.');
     }
+
     
     
 

@@ -27,12 +27,13 @@
         <div class="mb-4">
             <label for="id_autorizado" class="block text-sm font-medium text-gray-700 dark:text-white">Autorizado</label>
             <select name="id_autorizado" id="id_autorizado" class="mt-1 block w-full border border-gray-300 dark:bg-slate-900 dark:text-white bg-white text-black rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" required>
-                @foreach ($personas as $persona)
+                @foreach ($autorizados as $persona)
                     <option value="{{ $persona->id }}" {{ $persona->id == $orden->autorizado_id ? 'selected' : '' }}>
                         {{ $persona->primer_nombre }} {{ $persona->primer_apellido }}
                     </option>
                 @endforeach
             </select>
+
         </div>
 
         <div class="mb-4">
@@ -74,6 +75,7 @@
                 </thead>
                 <tbody>
                     @foreach (  $relacionDetalleOrden as $index => $detalle)
+                        <input type="hidden" name="detalles[{{ $index }}][id]" value="{{ $detalle->detalleOrden->id }}">
 
                         <tr>
                             <td>
@@ -89,12 +91,13 @@
                             </td>
                             <td>
                                 <select name="detalles[{{ $index }}][id_chofer]" class="form-control dark:bg-gray-800 dark:text-white text-black bg-white">
-                                    @foreach ($personas as $persona)
+                                    @foreach ($choferes as $persona)
                                         <option value="{{ $persona->id }}" {{ $persona->id == $detalle->detalleOrden->chofer_id ? 'selected' : '' }}>
                                             {{ $persona->primer_nombre }} {{ $persona->primer_apellido }}
                                         </option>
                                     @endforeach
                                 </select>
+
                             </td>
                             <td>
                                 <select name="detalles[{{ $index }}][id_combustible]" class="form-control dark:bg-gray-800 dark:text-white text-black bg-white">
@@ -146,11 +149,12 @@
                     </select>
                 </td>
                 <td>
-                    <select name="detalles[${detailIndex}][id_combustible]" class="form-control dark:bg-gray-800 dark:text-white text-black bg-white">
-                        @foreach ($combustibles as $combustible)
-                            <option value="{{ $combustible->id }}">{{ $combustible->nombre }}</option>
+                    <select name="detalles[${detailIndex}][id_chofer]" class="form-control dark:bg-gray-800 dark:text-white text-black bg-white">
+                        @foreach ($choferes as $persona)
+                            <option value="{{ $persona->id }}">{{ $persona->primer_nombre }} {{ $persona->primer_apellido }}</option>
                         @endforeach
                     </select>
+
                 </td>
                 
                 <td>
