@@ -86,85 +86,91 @@
 <main>
     @foreach($agrupadas as $grupo => $items)
         <table class="data">
-            <thead>
-            <tr class="grupo-header">
-                <td colspan="5">
-                    @if($filtro === 'vehiculo')
-                        @php $orden = $items->first()->orden ?? null; @endphp
-                    @else
-                        @php $orden = $items->first(); @endphp
-                    @endif
-
-                    @if($orden)
-                        Orden #{{ $orden->id }} - {{ $orden->fecha }} - 
-                        {{ $orden->gasolinera->nombre ?? 'N/D' }}
-                    @endif
-                </td>
-            </tr>
-
-                <tr>
-
-                    <th>Vehículo</th>
-                    <th>Kilometros</th>
-                    <th>Chofer</th>
-                    <th>Combustible</th>
-                    <th>Cant. Solicitada (L / gal)</th>
-                    <th>Cant. Entregada (L / gal)</th>
-                </tr>
-            </thead>
-            <tbody>
-    @if($filtro === 'vehiculo')
-        @foreach($items as $rel)
-            <tr>
-
-                <td>{{ $rel->detalleOrden->vehiculo->placa }}</td>
-                <td>{{ $rel->detalleOrden->chofer->primer_nombre }} {{ $rel->detalleOrden->chofer->primer_apellido }}</td>
-                <td>{{ $rel->detalleOrden->combustible->nombre }}</td>
-                <td>
-                    {{ number_format($rel->detalleOrden->cantidad, 2) }} L /
-                    {{ number_format($rel->detalleOrden->cantidad / 3.78541, 2) }} gal
-                </td>
-                <td>
-                    @if($rel->entregado)
-                        {{ number_format($rel->detalleOrden->cantidad, 2) }} L /
-                        {{ number_format($rel->detalleOrden->cantidad / 3.78541, 2) }} gal
-                    @else
-                        0.00 L / 0.00 gal
-                    @endif
-                </td>
-            </tr>
-        @endforeach
-    @else
-        @foreach($items as $orden)
-            @foreach($orden->relaciones as $rel)
-                <tr>
-
-                    <td>{{ $rel->detalleOrden->vehiculo->placa }}</td>
-                    <td>{{ $rel->detalleOrden->kilometros ?? '-' }}</td>
-
-                    <td>{{ $rel->detalleOrden->chofer->primer_nombre }} {{ $rel->detalleOrden->chofer->primer_apellido }}</td>
-                    <td>{{ $rel->detalleOrden->combustible->nombre }}</td>
-                    <td>
-                        {{ number_format($rel->detalleOrden->cantidad, 2) }} L /
-                        {{ number_format($rel->detalleOrden->cantidad / 3.78541, 2) }} gal
-                    </td>
-                    <td>
-                        @if($rel->entregado)
-                            {{ number_format($rel->detalleOrden->cantidad, 2) }} L /
-                            {{ number_format($rel->detalleOrden->cantidad / 3.78541, 2) }} gal
-                        @else
-                            0.00 L / 0.00 gal
-                        @endif
-                    </td>
-                </tr>
-            @endforeach
-        @endforeach
-    @endif
-</tbody>
-
+            @if($filtro === 'vehiculo')
+                @foreach($items as $rel)
+                    <thead>
+                        <tr class="grupo-header">
+                            <td colspan="6">
+                                Orden #{{ $rel->orden->id }} - {{ $rel->orden->fecha }} - 
+                                {{ $rel->orden->gasolinera->nombre ?? 'N/D' }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Vehículo</th>
+                            <th>Kilometros</th>
+                            <th>Chofer</th>
+                            <th>Combustible</th>
+                            <th>Cant. Solicitada (L / gal)</th>
+                            <th>Cant. Entregada (L / gal)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>{{ $rel->detalleOrden->vehiculo->placa }}</td>
+                            <td>{{ $rel->detalleOrden->kilometros ?? '-' }}</td>
+                            <td>{{ $rel->detalleOrden->chofer->primer_nombre }} {{ $rel->detalleOrden->chofer->primer_apellido }}</td>
+                            <td>{{ $rel->detalleOrden->combustible->nombre }}</td>
+                            <td>
+                                {{ number_format($rel->detalleOrden->cantidad, 2) }} L /
+                                {{ number_format($rel->detalleOrden->cantidad / 3.78541, 2) }} gal
+                            </td>
+                            <td>
+                                @if($rel->entregado)
+                                    {{ number_format($rel->detalleOrden->cantidad, 2) }} L /
+                                    {{ number_format($rel->detalleOrden->cantidad / 3.78541, 2) }} gal
+                                @else
+                                    0.00 L / 0.00 gal
+                                @endif
+                            </td>
+                        </tr>
+                    </tbody>
+                @endforeach
+            @else
+                @foreach($items as $orden)
+                    <thead>
+                        <tr class="grupo-header">
+                            <td colspan="6">
+                                Orden #{{ $orden->id }} - {{ $orden->fecha }} - 
+                                {{ $orden->gasolinera->nombre ?? 'N/D' }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Vehículo</th>
+                            <th>Kilometros</th>
+                            <th>Chofer</th>
+                            <th>Combustible</th>
+                            <th>Cant. Solicitada (L / gal)</th>
+                            <th>Cant. Entregada (L / gal)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($orden->relaciones as $rel)
+                            <tr>
+                                <td>{{ $rel->detalleOrden->vehiculo->placa }}</td>
+                                <td>{{ $rel->detalleOrden->kilometros ?? '-' }}</td>
+                                <td>{{ $rel->detalleOrden->chofer->primer_nombre }} {{ $rel->detalleOrden->chofer->primer_apellido }}</td>
+                                <td>{{ $rel->detalleOrden->combustible->nombre }}</td>
+                                <td>
+                                    {{ number_format($rel->detalleOrden->cantidad, 2) }} L /
+                                    {{ number_format($rel->detalleOrden->cantidad / 3.78541, 2) }} gal
+                                </td>
+                                <td>
+                                    @if($rel->entregado)
+                                        {{ number_format($rel->detalleOrden->cantidad, 2) }} L /
+                                        {{ number_format($rel->detalleOrden->cantidad / 3.78541, 2) }} gal
+                                    @else
+                                        0.00 L / 0.00 gal
+                                    @endif
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                @endforeach
+            @endif
         </table>
     @endforeach
 </main>
+
 
 </body>
 </html>
