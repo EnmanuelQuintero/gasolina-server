@@ -12,6 +12,7 @@
         <thead>
             <tr>
                 <th>Vehículo</th>
+                <th>Kilometros</th>
                 <th>Chofer</th>
                 <th>Combustible</th>
                 <th>Cantidad</th>
@@ -25,6 +26,7 @@
             @foreach($relaciones as $relacion)
                 <tr>
                     <td>{{ $relacion->detalleOrden->vehiculo->nombre ?? 'N/A' }}</td>
+                    <td>{{ $relacion->detalleOrden->kilometros ?? 'N/A' }}</td>
                     <td>{{ $relacion->detalleOrden->chofer->primer_nombre ?? 'N/A' }}</td>
                     <td>{{ $relacion->detalleOrden->combustible->nombre ?? 'N/A' }}</td>
                     <td>{{ $relacion->detalleOrden->cantidad }}</td>

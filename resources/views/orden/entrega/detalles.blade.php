@@ -8,7 +8,7 @@
 </a>
 
 <div class="max-w-7xl mx-auto px-4 py-6">
-    <h2 class="text-2xl font-bold text-gray-800 mb-6">Entrega de Detalles Banano para la Orden #{{ $orden->id }}</h2>
+    <h2 class="text-2xl font-bold text-gray-800 mb-6">Entrega de Detalles para la Orden #{{ $orden->id }}</h2>
 
     @if(session('success'))
         <div class="bg-green-100 text-green-800 px-4 py-2 rounded mb-4">
@@ -25,6 +25,7 @@
                     <tr>
                         <th class="px-4 py-2 text-left">Seleccionar</th>
                         <th class="px-4 py-2 text-left">Vehículo</th>
+                        <th class="px-4 py-2 text-left">Kiometros</th>
                         <th class="px-4 py-2 text-left">Chofer</th>
                         <th class="px-4 py-2 text-left">Combustible</th>
                         <th class="px-4 py-2 text-left">Cantidad</th>
@@ -52,7 +53,7 @@
                                     Estado: {{ $relacion->detalleOrden->vehiculo->estado }}
                                 </td>
                             @endif
-
+                            <td class="px-4 py-2">{{ $relacion->detalleOrden->kilometros ?? '' }}</td>
                             <td class="px-4 py-2">{{ $relacion->detalleOrden->chofer->primer_nombre ?? 'N/A' }}</td>
                             <td class="px-4 py-2">{{ $relacion->detalleOrden->combustible->nombre ?? 'N/A' }}</td>
                             <td class="px-4 py-2">{{ $relacion->detalleOrden->cantidad }}</td>
