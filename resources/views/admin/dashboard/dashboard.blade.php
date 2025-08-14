@@ -39,6 +39,7 @@
                 <thead class="text-xs uppercase bg-gray-100 dark:bg-gray-700">
                     <tr>
                         <th class="px-4 py-2">Vehículo</th>
+                        <th class="px-4 py-2">kilometros</th>
                         <th class="px-4 py-2">Chofer</th>
                         <th class="px-4 py-2">Combustible</th>
                         <th class="px-4 py-2">Cantidad</th>
@@ -49,6 +50,7 @@
                     @foreach ($ultimasCargas as $carga)
                         <tr class="border-b hover:bg-gray-50 dark:hover:bg-gray-700">
                             <td class="px-4 py-2">{{ $carga->vehiculo->placa ?? 'N/A' }}</td>
+                            <td class="px-4 py-2">{{ $carga->kilometros ?? 'N/A' }}</td>
                             <td class="px-4 py-2">{{ $carga->chofer->primer_nombre ?? 'N/A' }} {{ $carga->chofer->primer_apellido ?? '' }}</td>
                             <td class="px-4 py-2">{{ $carga->combustible->nombre ?? 'N/A' }}</td>
                             <td class="px-4 py-2">{{ $carga->cantidad }} {{ $carga->medida }}</td>

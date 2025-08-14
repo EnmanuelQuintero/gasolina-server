@@ -24,7 +24,7 @@ class ReporteExport implements FromCollection, WithStyles, WithHeadings, ShouldA
 
     public function headings(): array
     {
-        return ['#', 'Vehículo', 'Chofer', 'Combustible', 'Cant. Solicitada', 'Cant. Entregada'];
+        return ['#', 'Vehículo', 'Kilometros','Chofer', 'Combustible', 'Cant. Solicitada', 'Cant. Entregada'];
     }
 
     public function collection()
@@ -45,7 +45,7 @@ class ReporteExport implements FromCollection, WithStyles, WithHeadings, ShouldA
                 'Fecha: ' . $orden->fecha,
                 'Gasolinera: ' . ($orden->gasolinera->nombre ?? 'N/D'),
                 'Autorizada por: ' . ($orden->autorizado->primer_nombre ?? '') . ' ' . ($orden->autorizado->primer_apellido ?? ''),
-                'Observaciones: ' . ($orden->observaciones ?? '—'),
+                'Observacione: ' . ($orden->observaciones ?? '—'),
                 '',
             ];
             $this->data[] = $encabezado;
@@ -62,12 +62,14 @@ class ReporteExport implements FromCollection, WithStyles, WithHeadings, ShouldA
                 $this->data[] = [
                     $contador++,
                     $det->vehiculo->placa ?? 'N/D',
+                    $det->kilometros ?? '-',
                     ($det->chofer->primer_nombre ?? '') . ' ' . ($det->chofer->primer_apellido ?? ''),
                     $det->combustible->nombre ?? 'N/D',
                     "{$litrosSolic} L / {$galSolic} gal",
                     is_numeric($galEntreg) ? "{$litrosEntreg} L / {$galEntreg} gal" : 'Pendiente'
                 ];
             }
+            $contador=1;
         }
 
         return new Collection($this->data);

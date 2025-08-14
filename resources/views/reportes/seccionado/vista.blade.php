@@ -88,7 +88,7 @@
     <table class="data">
         <thead>
             <tr class="grupo-header">
-                <td colspan="5">
+                <td colspan="6">
                     @if($filtro === 'vehiculo')
                         @php $orden = $items->first()->orden ?? null; @endphp
                     @else
@@ -104,6 +104,7 @@
 
             <tr>
                 <th>Vehículo</th>
+                <th>kilometros</th>
                 <th>Chofer</th>
                 <th>Combustible</th>
                 <th>Cant. Solicitada (L / gal)</th>
@@ -115,6 +116,7 @@
                 @foreach($items as $rel)
                     <tr>
                         <td>{{ $rel->detalleOrden->vehiculo->placa }}</td>
+                        <td>{{ $rel->detalleOrden->kilometros ?? '-' }}</td>
                         <td>{{ $rel->detalleOrden->chofer->primer_nombre }} {{ $rel->detalleOrden->chofer->primer_apellido }}</td>
                         <td>{{ $rel->detalleOrden->combustible->nombre }}</td>
                         <td>

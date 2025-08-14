@@ -105,6 +105,7 @@
                 <tr>
 
                     <th>Vehículo</th>
+                    <th>Kilometros</th>
                     <th>Chofer</th>
                     <th>Combustible</th>
                     <th>Cant. Solicitada (L / gal)</th>
@@ -139,6 +140,8 @@
                 <tr>
 
                     <td>{{ $rel->detalleOrden->vehiculo->placa }}</td>
+                    <td>{{ $rel->detalleOrden->kilometros ?? '-' }}</td>
+
                     <td>{{ $rel->detalleOrden->chofer->primer_nombre }} {{ $rel->detalleOrden->chofer->primer_apellido }}</td>
                     <td>{{ $rel->detalleOrden->combustible->nombre }}</td>
                     <td>

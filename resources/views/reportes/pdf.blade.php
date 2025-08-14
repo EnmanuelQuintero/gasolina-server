@@ -104,6 +104,7 @@
             <tr>
                 <th>#</th>
                 <th>Vehículo</th>
+                <th>Kilometros</th>
                 <th>Chofer</th>
                 <th>Combustible</th>
                 <th>Cant. Solicitada</th>
@@ -114,7 +115,7 @@
             @foreach($ordenes as $orden)
                 {{-- Encabezado de la orden --}}
                 <tr class="orden-header">
-                    <td colspan="6">
+                    <td colspan="7">
                         Orden #{{ $orden->id }} — Fecha: {{ $orden->fecha }} |
                         Gasolinera: {{ $orden->gasolinera->nombre ?? 'N/D' }} |
                         Autorizada por: {{ $orden->autorizado->primer_nombre ?? '' }} {{ $orden->autorizado->primer_apellido ?? '' }}<br>
@@ -139,6 +140,8 @@
                     <tr>
                         <td>{{ $idx + 1 }}</td>
                         <td>{{ $det->vehiculo->placa ?? 'N/D' }}</td>
+                        <td>{{ $det->kilometros ?? '-' }}</td>
+
                         <td>{{ $det->chofer->primer_nombre ?? '' }} {{ $det->chofer->primer_apellido ?? '' }}</td>
                         <td>{{ $det->combustible->nombre ?? 'N/D' }}</td>
                         <td>{{ $litrosSolic }} L / {{ $galSolic }} gal</td>
