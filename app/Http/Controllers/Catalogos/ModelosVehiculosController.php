@@ -59,6 +59,7 @@ class ModelosVehiculosController extends Controller
         $request->validate([
             'modelo' => 'required|string|max:255',
             'marca_id' => 'required|exists:marcas,id',
+            'alcaldia' => 'required|boolean', // Validar que el campo 'alcaldia' sea un booleano
         ]);
 
         // Crear el nuevo modelo
@@ -71,12 +72,25 @@ class ModelosVehiculosController extends Controller
             'marca_id' => $request->marca_id,
             'modelo_id' => $modelo->id,
             'activo' => 1, // Asumimos que por defecto es activo
+            'alcaldia' => $request->alcaldia, // Guardar el valor de 'alcaldia'
         ]);
 
+        // Crear el vehículo, si es necesario, usando el valor de 'alcaldia'
+        Vehiculo::create([
+            'tipo' => $request->tipo,
+            'color' => $request->color,
+            'placa' => $request->placa,
+            'activo' => $request->activo ?? 1, // Si no se pasa, se asume como activo
+            'relacion_marca_modelo_id' => $modelo->id, // Relación con el modelo creado
+            'alcaldia' => $request->alcaldia, // Guardar el valor de 'alcaldia'
+        ]);
+
+        // Cargar los datos necesarios para la vista
         $marcas = Marca::all();
         $vehiculos = Vehiculo::all();
         $modelos = Modelo::all();
         $marcasModelos = RelacionMarcaModelo::all(); 
+
         return view('vehiculo.marcaModelo', compact('marcas', 'vehiculos', 'marcasModelos', 'modelos'));
     }
 

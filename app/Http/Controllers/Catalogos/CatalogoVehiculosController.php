@@ -137,14 +137,19 @@ public function update(Request $request, $id)
     }
 
     if ($request->has('placa')) {
-        $validationRules['placa'] = 'string|max:10|unique:vehiculos,placa,'.$id;
+        $validationRules['placa'] = 'string|max:10|unique:vehiculos,placa,' . $id;
     }
 
     if ($request->has('activo')) {
         $validationRules['activo'] = 'boolean';
     }
 
-    // ✅ Validar el campo estado si viene en la request
+    // ✅ Validación del campo 'alcaldia'
+    if ($request->has('alcaldia')) {
+        $validationRules['alcaldia'] = 'required|boolean';  // Validar que alcaldia sea un booleano
+    }
+
+    // ✅ Validación del campo estado si viene en la request
     if ($request->has('estado')) {
         $validationRules['estado'] = 'in:operativo,taller,baja';
     }
@@ -173,7 +178,12 @@ public function update(Request $request, $id)
         $vehiculo->activo = $request->activo ? 1 : 0;
     }
 
-    // ✅ Asignación del nuevo campo
+    // ✅ Asignación del nuevo campo 'alcaldia'
+    if ($request->has('alcaldia')) {
+        $vehiculo->alcaldia = $request->alcaldia;
+    }
+
+    // ✅ Asignación del campo 'estado' si viene en la request
     if ($request->has('estado')) {
         $vehiculo->estado = $request->estado;
     }
@@ -183,6 +193,7 @@ public function update(Request $request, $id)
 
     return redirect()->route('modelos-vehiculos.index')->with('success', 'Vehículo actualizado correctamente.');
 }
+
 
     public function toggleActivo($id)
     {

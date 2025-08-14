@@ -1,19 +1,13 @@
-
 <!-- Botón para Crear Vehículo -->
 <div class="relative inline-block text-left group">
     <button onclick="openModalVehiculo()" class="rounded-lg px-4 py-2 flex gap-4 bg-blue-600 hover:bg-blue-700 text-blue-100  duration-300">
-        
-        <span class="material-symbols-outlined">
-            add
-        </span>
+        <span class="material-symbols-outlined">add</span>
         Agregar Nuevo Vehículo
     </button>
     <div class="absolute left-1/2 transform dark:text-white -translate-x-1/2 z-10 hidden mt-2 w-48 rounded-md shadow-lg text-xs bg-transparent text-black p-2 group-hover:block">
         crea un nuevo registro de Vehículo.
     </div>
 </div>
-
-
 
 <!-- Modal -->
 <div id="vehicleModal" class="fixed inset-0 z-50 invisible bg-black bg-opacity-50 flex items-center justify-center">
@@ -41,7 +35,6 @@
                     <select name="relacion_marca_modelo_id" id="relacion_marca_modelo_id" class="block w-full mt-1 p-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300" required>
                     <option value="" disabled>Seleccione un Modelo</option>
                         @foreach($marcasModelos as $marcaModelo)
-                            
                             <option value="{{ $marcaModelo->id }}">{{ $marcaModelo->marca->nombre }} - {{ $marcaModelo->modelo->nombre }} </option>
                         @endforeach
                     </select>
@@ -55,18 +48,17 @@
                     <div class="relative">
                         <select id="color" name="color" class="block w-full mt-1 p-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300" required>
                             <option value="" disabled>Seleccione un color</option>
-                            <option value="blanco">Blanco</option>
-                            <option value="negro">Negro</option>
-                            <option value="gris">Gris</option>
-                            <option value="plateado">Plateado</option>
-                            <option value="azul">Azul</option>
-                            <option value="rojo">Rojo</option>
-                            <option value="verde">Verde</option>
-                            <option value="morado">Morado</option>
-                            <option value="amarillo">Amarillo</option>
-                            <option value="naranja">Naranja</option>
+                            <option value="Blanco">Blanco</option>
+                            <option value="Negro">Negro</option>
+                            <option value="Gris">Gris</option>
+                            <option value="Plateado">Plateado</option>
+                            <option value="Azul">Azul</option>
+                            <option value="Rojo">Rojo</option>
+                            <option value="Verde">Verde</option>
+                            <option value="Morado">Morado</option>
+                            <option value="Amarillo">Amarillo</option>
+                            <option value="Naranja">Naranja</option>
                         </select>
-
                     </div>
                     @error('color')
                         <div class="text-red-600 mt-1">{{ $message }}</div>
@@ -82,9 +74,27 @@
                 </div>
 
                 <div class="mb-4">
-                    
+                    <label for="activo" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Activo</label>
                     <input type="checkbox" name="activo" id="activo" value="1" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded dark:bg-gray-700 dark:border-gray-600 hidden" checked>
                     @error('activo')
+                        <div class="text-red-600 mt-1">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                <!-- Nuevo campo Alcaldía -->
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Tipo de Vehículo</label>
+                    <div class="flex items-center space-x-4">
+                        <label for="alcaldia" class="flex items-center">
+                            <input type="radio" id="alcaldia" name="alcaldia" value="1" class="mr-2">
+                            Alcaldía
+                        </label>
+                        <label for="privado" class="flex items-center">
+                            <input type="radio" id="privado" name="alcaldia" value="0" class="mr-2">
+                            Privado
+                        </label>
+                    </div>
+                    @error('alcaldia')
                         <div class="text-red-600 mt-1">{{ $message }}</div>
                     @enderror
                 </div>

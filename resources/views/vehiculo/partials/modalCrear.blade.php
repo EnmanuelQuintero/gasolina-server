@@ -126,32 +126,64 @@
 
 
 <script>
-    function openModalEditVehiculo(button) {
-        const modal = document.getElementById('editVehicleModal');
+function openModalEditVehiculo(button) {
+    const modal = document.getElementById('editVehicleModal');
 
-        // Obtener valores desde los atributos data-*
-        const id = button.getAttribute('data-id');
-        const placa = button.getAttribute('data-placa');
-        const tipo = button.getAttribute('data-tipo');
-        const color = button.getAttribute('data-color');
-        const modelo = button.getAttribute('data-modelo');
-        const activo = button.getAttribute('data-activo');
+    // Obtener valores desde los atributos data-*
+    const id = button.getAttribute('data-id');
+    const placa = button.getAttribute('data-placa');
+    const tipo = button.getAttribute('data-tipo');
+    const color = button.getAttribute('data-color');
+    const modelo = button.getAttribute('data-modelo');
+    const activo = button.getAttribute('data-activo');
+    const alcaldia = button.getAttribute('data-alcaldia');  // Atributo data-alcaldia
 
-        // Llenar los campos del formulario
-        document.getElementById('edit_vehiculo_id').value = id;
-        document.getElementById('edit_placa').value = placa;
-        document.getElementById('edit_tipo').value = tipo;
-        document.getElementById('edit_color').value = color;
-        document.getElementById('edit_relacion_marca_modelo_id').value = modelo;
-        document.getElementById('edit_activo').checked = activo == 1;
-        document.getElementById('edit_estado').value = button.dataset.estado;
-        // Actualizar la acción del formulario
-        const form = document.getElementById('editVehicleForm');
-        form.action = `/catalogo-vehiculos/${id}`; // Asegúrate que esta ruta sea correcta
+    // Llenar los campos del formulario
+    document.getElementById('edit_vehiculo_id').value = id;
+    document.getElementById('edit_placa').value = placa;
+    document.getElementById('edit_tipo').value = tipo;
+    document.getElementById('edit_relacion_marca_modelo_id').value = modelo;
+    document.getElementById('edit_activo').checked = activo == 1;
+    document.getElementById('edit_estado').value = button.dataset.estado;
 
-        // Mostrar el modal
-        modal.classList.remove('invisible');
+    // Cargar el valor de alcaldia (radio button)
+    if (alcaldia == 1) {
+        document.getElementById('alcaldia_edit').checked = true;
+    } else {
+        document.getElementById('privado_edit').checked = true;
     }
+
+    // Cargar el valor de color (select) de manera más robusta
+    const colorSelect = document.getElementById('edit_color');
+    const colorOptions = colorSelect.getElementsByTagName('option');
+    let colorFound = false;
+
+    // Iteramos sobre todas las opciones del select para encontrar el color
+    for (let i = 0; i < colorOptions.length; i++) {
+        // Comparamos el valor del color desde data-color y el valor de las opciones
+        if (colorOptions[i].value.trim() === color.trim()) {
+            colorOptions[i].selected = true;
+            colorFound = true;
+            break;
+        }
+    }
+
+    // Si no se encuentra el color, aseguramos que no se deje seleccionado un valor erróneo
+    if (!colorFound) {
+        // Podrías dejar un valor por defecto (por ejemplo, "Blanco") o vacío si no encuentras el color
+        colorSelect.value = ""; // o un valor por defecto como colorSelect.value = "Blanco";
+    }
+
+    // Actualizar la acción del formulario
+    const form = document.getElementById('editVehicleForm');
+    form.action = `/catalogo-vehiculos/${id}`; // Asegúrate que esta ruta sea correcta
+
+    // Mostrar el modal
+    modal.classList.remove('invisible');
+}
+
+
+
 
     function closeModalEditVehiculo() {
         document.getElementById('editVehicleModal').classList.add('invisible');

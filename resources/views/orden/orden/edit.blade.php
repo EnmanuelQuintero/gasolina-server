@@ -73,48 +73,77 @@
                         <th class="px-6 py-3 text-center">Acción</th>
                     </tr>
                 </thead>
-                <tbody>
-                    @foreach (  $relacionDetalleOrden as $index => $detalle)
-                        <input type="hidden" name="detalles[{{ $index }}][id]" value="{{ $detalle->detalleOrden->id }}">
+<tbody>
+    @foreach ($relacionDetalleOrden as $index => $detalle)
+        <input type="hidden" name="detalles[{{ $index }}][id]" value="{{ $detalle->detalleOrden->id }}">
 
-                        <tr>
-                            <td>
-                                <select name="detalles[{{ $index }}][numero_placa]" class="form-control dark:bg-gray-800 dark:text-white text-black bg-white">
-                                    
-                                    <option value=""></option>
-                                    @foreach ($vehiculos as $vehiculo)
-                                        @if ($vehiculo->estado === 'operativo')
-                                            <option value="{{ $vehiculo->id }}" {{ $vehiculo->placa == $detalle->detalleOrden->vehiculo->placa ? 'selected' : '' }}>
-                                                {{ $vehiculo->placa }}
-                                            </option>
-                                        @endif
-                                    @endforeach
-                                </select>
-                            </td>
-                            <td>
-                                <select name="detalles[{{ $index }}][id_chofer]" class="form-control dark:bg-gray-800 dark:text-white text-black bg-white">
-                                    @foreach ($choferes as $persona)
-                                        <option value="{{ $persona->id }}" {{ $persona->id == $detalle->detalleOrden->chofer_id ? 'selected' : '' }}>
-                                            {{ $persona->primer_nombre }} {{ $persona->primer_apellido }}
-                                        </option>
-                                    @endforeach
-                                </select>
+        <tr>
+            <td>
+                @if ($detalle->detalleOrden->vehiculo->estado === 'operativo')
+                    <select name="detalles[{{ $index }}][numero_placa]" 
+                            class="form-control dark:bg-gray-800 dark:text-white text-black bg-white">
+                        <option value=""></option>
+                        @foreach ($vehiculos as $vehiculo)
+                            @if ($vehiculo->estado === 'operativo')
+                                <option value="{{ $vehiculo->id }}" 
+                                        {{ $vehiculo->placa == $detalle->detalleOrden->vehiculo->placa ? 'selected' : '' }}>
+                                    {{ $vehiculo->placa }}
+                                </option>
+                            @endif
+                        @endforeach
+                    </select>
+                @else
+                    <input type="text" value="{{ $detalle->detalleOrden->vehiculo->placa }}" 
+                           class="form-control dark:bg-gray-800 dark:text-white text-black bg-white" 
+                           readonly />
+                    <!-- Campo hidden para enviar el ID del vehículo aunque no sea operativo -->
+                    <input type="hidden" name="detalles[{{ $index }}][numero_placa]" value="{{ $detalle->detalleOrden->vehiculo->id }}" />
+                @endif
+            </td>
 
-                            </td>
-                            <td>
-                                <select name="detalles[{{ $index }}][id_combustible]" class="form-control dark:bg-gray-800 dark:text-white text-black bg-white">
-                                    @foreach ($combustibles as $combustible)
-                                        <option value="{{ $combustible->id }}" {{ $combustible->id == $detalle->detalleOrden->combustible_id ? 'selected' : '' }}>
-                                            {{ $combustible->nombre }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </td>
-                            <td><input type="number" name="detalles[{{ $index }}][cantidad]" class="form-control dark:bg-gray-800 dark:text-white text-black bg-white w-auto " step="0.01" value="{{ $detalle->detalleOrden->cantidad  }}" required> <label for="detalle-cantidad">{{$detalle->detalleOrden->medida}}</label></td>
-                            <td><button type="button" class="middle none center mr-4 rounded-lg bg-red-500 py-3 px-6 font-sans text-xs font-bold uppercase text-white shadow-md shadow-red-500/20 transition-all hover:shadow-lg hover:shadow-red-500/40 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none">Eliminar</button></td>
-                        </tr>
+            <td>
+                <select name="detalles[{{ $index }}][id_chofer]" 
+                        class="form-control dark:bg-gray-800 dark:text-white text-black bg-white"
+                        {{ $detalle->detalleOrden->vehiculo->estado !== 'operativo' ? 'readonly' : '' }}>
+                    @foreach ($choferes as $persona)
+                        <option value="{{ $persona->id }}" 
+                                {{ $persona->id == $detalle->detalleOrden->chofer_id ? 'selected' : '' }}>
+                            {{ $persona->primer_nombre }} {{ $persona->primer_apellido }}
+                        </option>
                     @endforeach
-                </tbody>
+                </select>
+            </td>
+
+            <td>
+                <select name="detalles[{{ $index }}][id_combustible]" 
+                        class="form-control dark:bg-gray-800 dark:text-white text-black bg-white"
+                        {{ $detalle->detalleOrden->vehiculo->estado !== 'operativo' ? 'readonly' : '' }}>
+                    @foreach ($combustibles as $combustible)
+                        <option value="{{ $combustible->id }}" 
+                                {{ $combustible->id == $detalle->detalleOrden->combustible_id ? 'selected' : '' }}>
+                            {{ $combustible->nombre }}
+                        </option>
+                    @endforeach
+                </select>
+            </td>
+
+            <td>
+                <input type="number" name="detalles[{{ $index }}][cantidad]" 
+                       class="form-control dark:bg-gray-800 dark:text-white text-black bg-white w-auto mt-5"
+                       step="0.01" value="{{ $detalle->detalleOrden->cantidad }}" required 
+                       {{ $detalle->detalleOrden->vehiculo->estado !== 'operativo' ? 'readonly' : '' }} />
+                <label for="detalle-cantidad">{{$detalle->detalleOrden->medida}}</label>
+            </td>
+
+            <td>
+                <button type="button" class="middle none center mr-4 rounded-lg bg-red-500 py-3 px-6 font-sans text-xs font-bold uppercase text-white shadow-md shadow-red-500/20 transition-all hover:shadow-lg hover:shadow-red-500/40 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none">
+                    Eliminar
+                </button>
+            </td>
+        </tr>
+    @endforeach
+</tbody>
+
             </table>
         </div>
 

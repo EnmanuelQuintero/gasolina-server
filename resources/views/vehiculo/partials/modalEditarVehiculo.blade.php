@@ -12,6 +12,7 @@
             data-modelo="{{ $vehiculo->relacion_marca_modelo_id }}"
             data-activo="{{ $vehiculo->activo }}"
             data-estado="{{ $vehiculo->estado }}"
+            data-alcaldia="{{ $vehiculo->alcaldia }}"
             class="flex items-center justify-center p-2.5 bg-yellow-500 hover:bg-yellow-600 text-white rounded-full transition-all duration-300 shadow-md"
         >
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -112,6 +113,23 @@
                 <div class="mb-4">
                     <input type="checkbox" name="activo" id="edit_activo" value="1" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded dark:bg-gray-700 dark:border-gray-600 hidden">
                     @error('activo')
+                        <div class="text-red-600 mt-1">{{ $message }}</div>
+                    @enderror
+                </div>
+                <!-- Nuevo campo Alcaldía -->
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Tipo de Vehículo</label>
+                    <div class="flex items-center space-x-4">
+                        <label for="alcaldia_edit" class="flex items-center">
+                            <input type="radio" id="alcaldia_edit" name="alcaldia" value="1" class="mr-2">
+                            Alcaldía
+                        </label>
+                        <label for="privado_edit" class="flex items-center">
+                            <input type="radio" id="privado_edit" name="alcaldia" value="0" class="mr-2">
+                            Privado
+                        </label>
+                    </div>
+                    @error('alcaldia')
                         <div class="text-red-600 mt-1">{{ $message }}</div>
                     @enderror
                 </div>

@@ -18,7 +18,8 @@ class Vehiculo extends Model
         'relacion_marca_modelo_id',
         'color',
         'placa',
-        'estado' // <- Agregado aquí
+        'estado', // <- Agregado aquí
+        'alcaldia'
     ];
 
     /**

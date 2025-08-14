@@ -14,7 +14,7 @@
         <a href="{{ route('reportes.avanzado.form') }}"
            class="inline-flex items-center bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg transition duration-200 shadow-sm">
             <i class="fas fa-filter mr-2"></i>
-            Reporte Avanzado
+            Reporte Especifico
         </a>
     
         <!-- Botón: Ver Reportes de Órdenes -->
@@ -122,7 +122,7 @@
         data: {
             labels: {!! json_encode(array_map(fn($mes) => \Carbon\Carbon::create()->month($mes)->format('F'), array_keys($consumoMensual->toArray()))) !!}, // Etiquetas de meses
             datasets: [{
-                label: 'Litros consumidos', // Título de la serie de datos
+                label: 'Litros Solicitados', // Título de la serie de datos
                 data: {{ json_encode(array_values($consumoMensual->toArray())) }}, // Datos de consumo mensual
                 backgroundColor: '#3b82f6' // Color de fondo de las barras
             }]
