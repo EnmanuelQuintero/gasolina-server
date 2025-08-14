@@ -24,9 +24,13 @@
             Ver Reportes de Órdenes
         </a>
     </div>
-    
+
+
     {{-- Tarjetas de resumen --}}
     @include('admin.dashboard.partials.resumen')
+
+    {{-- Top Vehiculos --}}
+    @include('admin.dashboard.partials.topVehiculos')
 
     {{-- Graficos --}}
     @include('admin.dashboard.partials.graficos')

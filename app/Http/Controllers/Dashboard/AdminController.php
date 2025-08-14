@@ -25,6 +25,16 @@ class AdminController extends Controller
     
     public function index()
     {
+        $topVehiculosKilometraje = DetalleOrden::selectRaw('detalle_orden.vehiculo_id, SUM(detalle_orden.kilometros) as total_kilometros')
+            ->join('relacion_orden_detalle as rod', 'rod.detalle_orden_id', '=', 'detalle_orden.id')
+            ->where('rod.entregado', true)
+            ->whereNotNull('detalle_orden.kilometros')
+            ->groupBy('detalle_orden.vehiculo_id')
+            ->orderByDesc('total_kilometros')
+            ->with('vehiculo')
+            ->limit(10)
+            ->get();
+
         // Total de combustible consumido (solo órdenes activas)
         $combustibleConsumido = DetalleOrden::from('detalle_orden')
         ->where('detalle_orden.activo', 1)
@@ -100,6 +110,7 @@ class AdminController extends Controller
             'consumoMensual',
             'combustibleSolicitado', 
             'combustibleEntregado',
+            'topVehiculosKilometraje',
         ));
     }
     
