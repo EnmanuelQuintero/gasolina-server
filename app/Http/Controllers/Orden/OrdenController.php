@@ -72,40 +72,51 @@ public function index(Request $request)
         return view('orden.orden.create', compact('gasolineras', 'personas', 'vehiculos', 'combustibles'));
     }
 
-    public function store(Request $request)
-    {
+public function store(Request $request)
+{
+    // Crear la orden principal
+    $orden = Orden::create([
+        'fecha' => $request->fecha,
+        'gasolinera_id' => $request->id_gasolinera,
+        'autorizado_id' => $request->id_autorizado,
+        'observaciones' => $request->observaciones,
+        'token' => bin2hex(openssl_random_pseudo_bytes(8)),
+    ]);
 
-        //dd($request->all());
-        $orden = Orden::create([
-            'fecha' => $request->fecha,
-            'gasolinera_id' => $request->id_gasolinera,
-            'autorizado_id' => $request->id_autorizado,
-            'observaciones' => $request->observaciones,
-            'token' => bin2hex(openssl_random_pseudo_bytes(8)),
-        ]);
-    
-        foreach ($request->detalles as $detalle) {
-            $detalleguardar = DetalleOrden::create([
-                'vehiculo_id' => $detalle['numero_placa'],
-                'chofer_id' => $detalle['id_chofer'],
-                'combustible_id' => $detalle['id_combustible'],
-                'cantidad' => $detalle['cantidad'],
-                'medida' => $request->medida,
-            ]);
+    // Procesar los detalles de la orden
+    foreach ($request->detalles as $detalle) {
+        // Verificar si el vehículo tiene kilómetros (solo si es de la alcaldía)
+        $kilometros = null; // Valor predeterminado
 
-            // Crear la relación entre la marca y el modelo
-            RelacionOrdenDetalle::create([
-                'activo' => 1, // Asumimos que por defecto es activo
-                'orden_id' => $orden->id,
-                'detalle_orden_id' => $detalleguardar->id,
-
-            ]);
+        if (isset($detalle['kilometros']) && !empty($detalle['kilometros'])) {
+            // Verificar si el vehículo es de la alcaldía
+            $vehiculo = Vehiculo::find($detalle['numero_placa']);
+            if ($vehiculo && $vehiculo->alcaldia) {
+                $kilometros = $detalle['kilometros'];
+            }
         }
 
+        // Crear el detalle de la orden
+        $detalleguardar = DetalleOrden::create([
+            'vehiculo_id' => $detalle['numero_placa'],
+            'chofer_id' => $detalle['id_chofer'],
+            'combustible_id' => $detalle['id_combustible'],
+            'cantidad' => $detalle['cantidad'],
+            'medida' => $request->medida,
+            'kilometros' => $kilometros,  // Guardar kilómetros si es de la alcaldía
+        ]);
 
-    
-        return redirect()->route('orden.index')->with('success', 'Orden creada con éxito.');
+        // Crear la relación entre la orden y el detalle de la orden
+        RelacionOrdenDetalle::create([
+            'activo' => 1,  // Asumimos que por defecto es activo
+            'orden_id' => $orden->id,
+            'detalle_orden_id' => $detalleguardar->id,
+        ]);
     }
+
+    // Redirigir a la vista de órdenes con un mensaje de éxito
+    return redirect()->route('orden.index')->with('success', 'Orden creada con éxito.');
+}
 
     // Muestra el formulario para editar una orden
     public function edit($id)
@@ -148,78 +159,90 @@ public function index(Request $request)
     }
 
 
-    public function update(Request $request, $id)
-    {
-        $request->validate([
-            'fecha' => 'nullable|date',
-            'id_gasolinera' => 'nullable|exists:gasolineras,id',
-            'id_autorizado' => 'nullable|exists:personas,id',
-            'observaciones' => 'nullable|string',
-            'detalles.*.numero_placa' => 'nullable|string',
-            'detalles.*.id_chofer' => 'nullable|exists:personas,id',
-            'detalles.*.id_combustible' => 'nullable|exists:combustibles,id',
-            'detalles.*.cantidad' => 'nullable|numeric',
-            'detalles.*.medida' => 'nullable|string|in:Litros,Galones',
-        ]);
+public function update(Request $request, $id)
+{
+    $request->validate([
+        'fecha' => 'nullable|date',
+        'id_gasolinera' => 'nullable|exists:gasolineras,id',
+        'id_autorizado' => 'nullable|exists:personas,id',
+        'observaciones' => 'nullable|string',
+        'detalles.*.numero_placa' => 'nullable|string',
+        'detalles.*.id_chofer' => 'nullable|exists:personas,id',
+        'detalles.*.id_combustible' => 'nullable|exists:combustibles,id',
+        'detalles.*.cantidad' => 'nullable|numeric',
+        'detalles.*.medida' => 'nullable|string|in:Litros,Galones',
+        'detalles.*.kilometros' => 'nullable|numeric', // <-- Agregado
+    ]);
 
-        $orden = Orden::findOrFail($id);
+    $orden = Orden::findOrFail($id);
 
-        // 1. Actualiza la orden
-        $orden->update([
-            'fecha' => $request->input('fecha'),
-            'gasolinera_id' => $request->input('id_gasolinera'),
-            'autorizado_id' => $request->input('id_autorizado'),
-            'observaciones' => $request->input('observaciones'),
-            'activo' => 1,
-        ]);
+    // 1. Actualiza la orden
+    $orden->update([
+        'fecha' => $request->input('fecha'),
+        'gasolinera_id' => $request->input('id_gasolinera'),
+        'autorizado_id' => $request->input('id_autorizado'),
+        'observaciones' => $request->input('observaciones'),
+        'activo' => 1,
+    ]);
 
-        $detalles = $request->input('detalles', []);
+    $detalles = $request->input('detalles', []);
 
-        // 2. Obtiene los IDs de detalles que siguen existiendo
-        $idsExistentes = collect($detalles)->pluck('id')->filter()->all();
+    // 2. Obtiene los IDs de detalles que siguen existiendo
+    $idsExistentes = collect($detalles)->pluck('id')->filter()->all();
 
-        // 3. Elimina relaciones y detalles que ya no están
-        RelacionOrdenDetalle::where('orden_id', $orden->id)
-            ->whereHas('detalleOrden', function ($q) use ($idsExistentes) {
-                $q->whereNotIn('id', $idsExistentes);
-            })
-            ->each(function ($relacion) {
-                // Elimina la relación y el detalle
-                $relacion->detalleOrden->delete();
-                $relacion->delete();
-            });
+    // 3. Elimina relaciones y detalles que ya no están
+    RelacionOrdenDetalle::where('orden_id', $orden->id)
+        ->whereHas('detalleOrden', function ($q) use ($idsExistentes) {
+            $q->whereNotIn('id', $idsExistentes);
+        })
+        ->each(function ($relacion) {
+            // Elimina la relación y el detalle
+            $relacion->detalleOrden->delete();
+            $relacion->delete();
+        });
 
-        // 4. Procesa cada detalle
-        foreach ($detalles as $detalle) {
-            if (isset($detalle['id'])) {
-                // Actualizar detalle existente
-                $detalleOrden = DetalleOrden::findOrFail($detalle['id']);
-                $detalleOrden->update([
-                    'vehiculo_id' => $detalle['numero_placa'],
-                    'chofer_id' => $detalle['id_chofer'],
-                    'combustible_id' => $detalle['id_combustible'],
-                    'cantidad' => $detalle['cantidad'],
-                    'medida' => $request->medida,
-                ]);
-            } else {
-                // Crear nuevo detalle y su relación
-                $nuevoDetalle = DetalleOrden::create([
-                    'vehiculo_id' => $detalle['numero_placa'],
-                    'chofer_id' => $detalle['id_chofer'],
-                    'combustible_id' => $detalle['id_combustible'],
-                    'cantidad' => $detalle['cantidad'],
-                    'medida' => $request->medida,
-                ]);
-
-                RelacionOrdenDetalle::create([
-                    'orden_id' => $orden->id,
-                    'detalle_orden_id' => $nuevoDetalle->id,
-                ]);
+    // 4. Procesa cada detalle
+    foreach ($detalles as $detalle) {
+        // Obtener kilómetros solo si el vehículo es de la alcaldía
+        $kilometros = null;
+        if (isset($detalle['kilometros']) && !empty($detalle['kilometros'])) {
+            $vehiculo = Vehiculo::find($detalle['numero_placa']);
+            if ($vehiculo && $vehiculo->alcaldia) {
+                $kilometros = $detalle['kilometros'];
             }
         }
 
-        return redirect()->route('orden.index')->with('success', 'Orden actualizada con éxito.');
+        if (isset($detalle['id'])) {
+            // Actualizar detalle existente
+            $detalleOrden = DetalleOrden::findOrFail($detalle['id']);
+            $detalleOrden->update([
+                'vehiculo_id' => $detalle['numero_placa'],
+                'chofer_id' => $detalle['id_chofer'],
+                'combustible_id' => $detalle['id_combustible'],
+                'cantidad' => $detalle['cantidad'],
+                'medida' => $request->medida, // corregido para tomar del detalle
+                'kilometros' => $kilometros,
+            ]);
+        } else {
+            // Crear nuevo detalle y su relación
+            $nuevoDetalle = DetalleOrden::create([
+                'vehiculo_id' => $detalle['numero_placa'],
+                'chofer_id' => $detalle['id_chofer'],
+                'combustible_id' => $detalle['id_combustible'],
+                'cantidad' => $detalle['cantidad'],
+                'medida' => $request->medida,
+                'kilometros' => $kilometros,
+            ]);
+
+            RelacionOrdenDetalle::create([
+                'orden_id' => $orden->id,
+                'detalle_orden_id' => $nuevoDetalle->id,
+            ]);
+        }
     }
+
+    return redirect()->route('orden.index')->with('success', 'Orden actualizada con éxito.');
+}
 
     
     

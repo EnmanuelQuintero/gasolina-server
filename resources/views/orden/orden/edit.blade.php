@@ -67,6 +67,7 @@
                 <thead class="text-xs text-gray-700 uppercase bg-gray-100 dark:bg-gray-700 dark:text-gray-200">
                     <tr>
                         <th class="px-6 py-3">Placa</th>
+                        <th class="px-6 py-3">Kilometros</th>
                         <th class="px-6 py-3">Chofer</th>
                         <th class="px-6 py-3">Combustible</th>
                         <th class="px-6 py-3 w-auto">Cantidad</th>
@@ -78,28 +79,42 @@
         <input type="hidden" name="detalles[{{ $index }}][id]" value="{{ $detalle->detalleOrden->id }}">
 
         <tr>
-            <td>
-                @if ($detalle->detalleOrden->vehiculo->estado === 'operativo')
-                    <select name="detalles[{{ $index }}][numero_placa]" 
-                            class="form-control dark:bg-gray-800 dark:text-white text-black bg-white">
-                        <option value=""></option>
-                        @foreach ($vehiculos as $vehiculo)
-                            @if ($vehiculo->estado === 'operativo')
-                                <option value="{{ $vehiculo->id }}" 
-                                        {{ $vehiculo->placa == $detalle->detalleOrden->vehiculo->placa ? 'selected' : '' }}>
-                                    {{ $vehiculo->placa }}
-                                </option>
-                            @endif
-                        @endforeach
-                    </select>
-                @else
-                    <input type="text" value="{{ $detalle->detalleOrden->vehiculo->placa }}" 
-                           class="form-control dark:bg-gray-800 dark:text-white text-black bg-white" 
-                           readonly />
-                    <!-- Campo hidden para enviar el ID del vehículo aunque no sea operativo -->
-                    <input type="hidden" name="detalles[{{ $index }}][numero_placa]" value="{{ $detalle->detalleOrden->vehiculo->id }}" />
+<td>
+    @if ($detalle->detalleOrden->vehiculo->estado === 'operativo')
+        <select name="detalles[{{ $index }}][numero_placa]" 
+                class="form-control dark:bg-gray-800 dark:text-white text-black bg-white" 
+                id="vehiculo_placa_{{ $index }}">
+            <option value=""></option>
+            @foreach ($vehiculos as $vehiculo)
+                @if ($vehiculo->estado === 'operativo')
+                    <option value="{{ $vehiculo->id }}" 
+                            {{ $vehiculo->placa == $detalle->detalleOrden->vehiculo->placa ? 'selected' : '' }} 
+                            data-es-alcaldia="{{ $vehiculo->alcaldia ? 1 : 0 }}">
+                        {{ $vehiculo->placa }}
+                    </option>
                 @endif
-            </td>
+            @endforeach
+        </select>
+    @else
+        <input type="text" value="{{ $detalle->detalleOrden->vehiculo->placa }}" 
+               class="form-control dark:bg-gray-800 dark:text-white text-black bg-white" 
+               readonly />
+        <!-- Campo hidden para enviar el ID del vehículo aunque no sea operativo -->
+        <input type="hidden" name="detalles[{{ $index }}][numero_placa]" value="{{ $detalle->detalleOrden->vehiculo->id }}" />
+    @endif
+</td>
+
+<!-- Kilómetros -->
+<td>
+    <label for="detalles[{{ $index }}][kilometros]" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"></label>
+
+
+    <input type="number" name="detalles[{{ $index }}][kilometros]" 
+           class="block w-full border rounded-md dark:bg-gray-700 dark:text-gray-200 mt-4" 
+           step="0.01" id="kilometros_{{ $index }}" 
+           value="{{ $detalle->detalleOrden->kilometros }}" 
+           @if(!$detalle->detalleOrden->vehiculo->alcaldia) disabled @endif>
+</td>
 
             <td>
                 <select name="detalles[{{ $index }}][id_chofer]" 
@@ -153,7 +168,25 @@
         </div>
     </form>
 </div>
+<script>
+document.addEventListener('change', function(event) {
+    if (event.target.id.startsWith('vehiculo_placa_')) {
+        const selectedOption = event.target.options[event.target.selectedIndex];
+        const esAlcaldia = selectedOption.getAttribute('data-es-alcaldia') === '1';
 
+        // Encontramos el input de kilómetros asociado a esta fila
+        const kilometrosInput = event.target.closest('tr').querySelector('input[type="number"]');
+        
+        // Habilitar o deshabilitar el campo de Kilómetros según corresponda
+        if (esAlcaldia) {
+            kilometrosInput.disabled = false; // Habilitamos el campo si es de la alcaldía
+        } else {
+            kilometrosInput.disabled = true; // Deshabilitamos el campo si no es de la alcaldía
+        }
+    }
+});
+
+</script>
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         const today = new Date().toISOString().split('T')[0];
@@ -165,22 +198,27 @@
             const tbody = document.querySelector('#detalles tbody');
             const newRow = document.createElement('tr');
             newRow.innerHTML = `
-                <td>
-                    <select name="detalles[${detailIndex}][numero_placa]" class="form-control dark:bg-gray-800 dark:text-white text-black bg-white">
-                        @foreach ($vehiculos as $vehiculo)
-                            @if ($vehiculo->estado === 'operativo')
-                                <option value="{{ $vehiculo->id }}">{{ $vehiculo->placa }}</option>
-                            @endif
-                        @endforeach
-                    </select>
-                </td>
-                <td>
-                    <select name="detalles[${detailIndex}][id_chofer]" class="form-control dark:bg-gray-800 dark:text-white text-black bg-white">
-                        @foreach ($personas as $persona)
-                            <option value="{{ $persona->id }}">{{ $persona->primer_nombre }} {{ $persona->primer_apellido }}</option>
-                        @endforeach
-                    </select>
-                </td>
+            <td class="px-4 py-2">
+                <select name="detalles[${detailIndex}][numero_placa]" 
+                    class="block w-full bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-200 border rounded-md" 
+                    id="vehiculo_placa_${detailIndex}">
+                    <option value="" disabled selected>Elija un vehículo</option>
+                    @foreach ($vehiculos as $vehiculo)
+                        @if ($vehiculo->estado === 'operativo')
+                            <option value="{{ $vehiculo->id }}" data-es-alcaldia="{{ $vehiculo->alcaldia ? 1 : 0 }}">
+                                {{ $vehiculo->placa }}
+                            </option>
+                        @endif
+                    @endforeach
+                </select>
+            </td>
+            <!-- Nueva columna de Kilómetros -->
+            <td class="px-4 py-2">
+                <label for="detalles[${detailIndex}][kilometros]" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"></label>
+                <input type="number" name="detalles[${detailIndex}][kilometros]" 
+                    class="block w-full border rounded-md dark:bg-gray-700 dark:text-gray-200" 
+                    step="0.01" id="kilometros_${detailIndex}" disabled>
+            </td>
                 <td>
                     <select name="detalles[${detailIndex}][id_chofer]" class="form-control dark:bg-gray-800 dark:text-white text-black bg-white">
                         @foreach ($choferes as $persona)
@@ -189,7 +227,18 @@
                     </select>
 
                 </td>
-                
+                            <td>
+                <select name="detalles[{{ $index }}][id_combustible]" 
+                        class="form-control dark:bg-gray-800 dark:text-white text-black bg-white"
+                        {{ $detalle->detalleOrden->vehiculo->estado !== 'operativo' ? 'readonly' : '' }}>
+                    @foreach ($combustibles as $combustible)
+                        <option value="{{ $combustible->id }}" 
+                                {{ $combustible->id == $detalle->detalleOrden->combustible_id ? 'selected' : '' }}>
+                            {{ $combustible->nombre }}
+                        </option>
+                    @endforeach
+                </select>
+            </td>
                 <td>
                     <select name="detalles[${detailIndex}][medida]" class="form-control dark:bg-gray-800 dark:text-white text-black bg-white">
                         <option value="Litros">Litros</option>

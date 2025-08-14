@@ -18,6 +18,7 @@ class DetalleOrden extends Model
         'combustible_id',
         'cantidad',
         'medida',
+        'kilometros'
     ];
 
     public function vehiculo()

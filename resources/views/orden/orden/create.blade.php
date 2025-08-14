@@ -143,6 +143,7 @@
                     <thead>
                         <tr class="text-left bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-300">
                             <th class="px-4 py-2">Placa</th>
+                            <th class="px-4 py-2">Kilómetros</th>
                             <th class="px-4 py-2">Chofer</th>
                             <th class="px-4 py-2">Combustible</th>
                             <th class="px-4 py-2">Cantidad</th>
@@ -167,15 +168,40 @@
                                     <div data-popper-arrow></div>
                                 </div>
 
-                                <select name="detalles[0][numero_placa]" class="block w-full bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-200 border rounded-md mt-2">
+                                <select name="detalles[0][numero_placa]" class="block w-full bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-200 border rounded-md mt-2" id="vehiculo_placa">
+                                    <!-- Opción "Elija" por defecto -->
+                                    <option value="" disabled selected>Elija un vehículo</option>
+                                    
                                     @foreach ($vehiculos as $vehiculo)
                                         @if ($vehiculo->estado === 'operativo')
-                                            <option value="{{ $vehiculo->id }}">{{ $vehiculo->placa }}</option>
+                                            <!-- Aquí agregamos el atributo data-es-alcaldia -->
+                                            <option value="{{ $vehiculo->id }}" data-es-alcaldia="{{ $vehiculo->alcaldia ? 1 : 0 }}">
+                                                {{ $vehiculo->placa }}
+                                            </option>
                                         @endif
                                     @endforeach
                                 </select>
-
                             </td>
+
+                            <!-- Condición para mostrar el campo de Kilómetros -->
+                            <td class="px-4 py-2 mt-6">
+                                <label for="detalles[0][kilometros]" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Kilómetros</label>
+                                <button data-popover-target="popover-kilometros" type="button" class="text-blue-500 text-sm underline">¿Qué es esto?</button>
+
+                                <div data-popover id="popover-kilometros" role="tooltip" class="absolute z-10 invisible inline-block w-64 text-sm text-gray-500 transition-opacity duration-300 bg-white border border-gray-200 rounded-lg shadow-sm opacity-0 dark:text-gray-400 dark:border-gray-600 dark:bg-gray-800">
+                                    <div class="px-3 py-2 bg-gray-100 border-b border-gray-200 rounded-t-lg dark:border-gray-600 dark:bg-gray-700">
+                                        <h3 class="font-semibold text-gray-900 dark:text-white">Kilómetros</h3>
+                                    </div>
+                                    <div class="px-3 py-2">
+                                        <p>Este campo es obligatorio solo para los vehículos de la alcaldía. Si el vehículo seleccionado no pertenece a la alcaldía, este campo estará deshabilitado.</p>
+                                    </div>
+                                    <div data-popper-arrow></div>
+                                </div>
+
+                                <input type="number" name="detalles[0][kilometros]" class="block w-full border rounded-md dark:bg-gray-700 dark:text-gray-200 mt-4" step="0.01" id="kilometros" disabled>
+                            </td>
+
+
 
                             <td class="px-4 py-2">
                                 <label for="detalles[0][id_chofer]" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Chofer</label>
@@ -287,88 +313,136 @@
     </form>
 </div>
 
+<script>
+    document.getElementById('vehiculo_placa').addEventListener('change', function() {
+        // Obtenemos la opción seleccionada
+        var selectedOption = this.options[this.selectedIndex];
+
+        // Verificamos si el vehículo es de la Alcaldía
+        var esAlcaldia = selectedOption.getAttribute('data-es-alcaldia') === '1'; // '1' indica que es de la alcaldía
+
+        // Obtenemos el campo de kilómetros
+        var kilometrosInput = document.getElementById('kilometros');
+
+        // Habilitar o deshabilitar el campo de Kilómetros según corresponda
+        if (esAlcaldia) {
+            kilometrosInput.disabled = false; // Habilitamos el campo si es de la alcaldía
+        } else {
+            kilometrosInput.disabled = true; // Deshabilitamos el campo si no es de la alcaldía
+        }
+    });
+</script>
+
 
 <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const fechaInput = document.getElementById('fecha');
-        const today = new Date().toISOString().split('T')[0];
-        fechaInput.value = today;
+document.addEventListener('DOMContentLoaded', () => {
+    const fechaInput = document.getElementById('fecha');
+    const today = new Date().toISOString().split('T')[0];
+    fechaInput.value = today;
 
-        const saveOrderButton = document.querySelector('button[type="submit"]');
-        let detailIndex = 1;
+    const saveOrderButton = document.querySelector('button[type="submit"]');
+    let detailIndex = 1;
 
-        // Agregar nuevo detalle
-        document.getElementById('add-detail').addEventListener('click', () => {
-            const tbody = document.querySelector('#detalles tbody');
-            const newRow = document.createElement('tr');
-            newRow.innerHTML = `
-                <td class="px-4 py-2">
-                    <select name="detalles[${detailIndex}][numero_placa]" 
-                        class="block w-full bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-200 border rounded-md">
-                        @foreach ($vehiculos as $vehiculo)
-                            @if ($vehiculo->estado === 'operativo')
-                                <option value="{{ $vehiculo->id }}">{{ $vehiculo->placa }}</option>
-                            @endif
-                        @endforeach
-                    </select>
+    // Agregar nuevo detalle
+    document.getElementById('add-detail').addEventListener('click', () => {
+        const tbody = document.querySelector('#detalles tbody');
+        const newRow = document.createElement('tr');
+        newRow.innerHTML = `
+            <td class="px-4 py-2">
+                <select name="detalles[${detailIndex}][numero_placa]" 
+                    class="block w-full bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-200 border rounded-md" 
+                    id="vehiculo_placa_${detailIndex}">
+                    <option value="" disabled selected>Elija un vehículo</option>
+                    @foreach ($vehiculos as $vehiculo)
+                        @if ($vehiculo->estado === 'operativo')
+                            <option value="{{ $vehiculo->id }}" data-es-alcaldia="{{ $vehiculo->alcaldia ? 1 : 0 }}">
+                                {{ $vehiculo->placa }}
+                            </option>
+                        @endif
+                    @endforeach
+                </select>
+            </td>
+            <!-- Nueva columna de Kilómetros -->
+            <td class="px-4 py-2">
+                <label for="detalles[${detailIndex}][kilometros]" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"></label>
+                <input type="number" name="detalles[${detailIndex}][kilometros]" 
+                    class="block w-full border rounded-md dark:bg-gray-700 dark:text-gray-200" 
+                    step="0.01" id="kilometros_${detailIndex}" disabled>
+            </td>
+            <td class="px-4 py-2">
+                <select name="detalles[${detailIndex}][id_chofer]" 
+                    class="block w-full bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-200 border rounded-md">
+                    @foreach ($personas as $persona)
+                        @if ($persona->chofer == 1)
+                            <option value="{{ $persona->id }}">{{ $persona->primer_nombre }} {{ $persona->primer_apellido }}</option>
+                        @endif
+                    @endforeach
+                </select>
+            </td>
 
-                </td>
+            <td class="px-4 py-2">
+                <select name="detalles[${detailIndex}][id_combustible]" 
+                    class="block w-full bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-200 border rounded-md">
+                    @foreach ($combustibles as $combustible)
+                        <option value="{{ $combustible->id }}">{{ $combustible->nombre }}</option>
+                    @endforeach
+                </select>
+            </td>
 
-                <td class="px-4 py-2">
-                    <select name="detalles[${detailIndex}][id_chofer]" 
-                        class="block w-full bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-200 border rounded-md">
-                        @foreach ($personas as $persona)
-                            @if ($persona->chofer == 1)
-                                <option value="{{ $persona->id }}">{{ $persona->primer_nombre }} {{ $persona->primer_apellido }}</option>
-                            @endif
-                            @endforeach
-                    </select>
-                </td>
-                <td class="px-4 py-2">
-                    <select name="detalles[${detailIndex}][id_combustible]" 
-                        class="block w-full bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-200 border rounded-md">
-                        @foreach ($combustibles as $combustible)
-                            <option value="{{ $combustible->id }}">{{ $combustible->nombre }}</option>
-                        @endforeach
-                    </select>
-                </td>
-                <td class="px-4 py-2">
-                    <input type="number" name="detalles[${detailIndex}][cantidad]" 
-                        class="block w-full border rounded-md dark:bg-gray-700 dark:text-gray-200" 
-                        step="0.01" required>
-                </td>
-                <td class="px-4 py-2 text-center">
-                    <button type="button" 
-                        class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition-all remove-row">
-                        Eliminar
-                    </button>
-                </td>
-            `;
-            tbody.appendChild(newRow);
-            detailIndex++;
-            saveOrderButton.classList.remove('hidden'); // Mostrar el botón de guardar si se agrega un detalle
+            <td class="px-4 py-2">
+                <input type="number" name="detalles[${detailIndex}][cantidad]" 
+                    class="block w-full border rounded-md dark:bg-gray-700 dark:text-gray-200" 
+                    step="0.01" required>
+            </td>
+
+
+
+            <td class="px-4 py-2 text-center">
+                <button type="button" 
+                    class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition-all remove-row">
+                    Eliminar
+                </button>
+            </td>
+        `;
+
+        tbody.appendChild(newRow);
+        detailIndex++;
+
+        // Mostrar el botón de guardar si se agrega un detalle
+        saveOrderButton.classList.remove('hidden'); 
+
+        // Agregar evento para habilitar/deshabilitar el campo de Kilómetros
+        const vehiculoSelect = document.querySelector(`#vehiculo_placa_${detailIndex - 1}`);
+        vehiculoSelect.addEventListener('change', (e) => {
+            const selectedOption = e.target.options[e.target.selectedIndex];
+            const isAlcaldia = selectedOption.getAttribute('data-es-alcaldia') === '1';
+            const kilometrosInput = document.querySelector(`#kilometros_${detailIndex - 1}`);
+            // Habilitar o deshabilitar el campo de Kilómetros según si el vehículo es de la alcaldía
+            kilometrosInput.disabled = !isAlcaldia;
         });
+    });
 
-        // Eliminar una fila de detalles
-        document.querySelector('#detalles').addEventListener('click', (e) => {
-            if (e.target.classList.contains('remove-row')) {
-                e.target.closest('tr').remove();
-                // Ocultar el botón de guardar si no hay detalles
-                if (document.querySelectorAll('#detalles tbody tr').length === 0) {
-                    saveOrderButton.classList.add('hidden');
-                }
+    // Eliminar una fila de detalles
+    document.querySelector('#detalles').addEventListener('click', (e) => {
+        if (e.target.classList.contains('remove-row')) {
+            e.target.closest('tr').remove();
+            // Ocultar el botón de guardar si no hay detalles
+            if (document.querySelectorAll('#detalles tbody tr').length === 0) {
+                saveOrderButton.classList.add('hidden');
             }
-        });
+        }
     });
+});
 
-    // Cambiar texto dinámico según selección de medida
-    document.querySelectorAll('input[name="medida"]').forEach((radio) => {
-        radio.addEventListener('change', function () {
-            document.querySelectorAll('.medida').forEach((label) => {
-                label.textContent = this.value;
-            });
+// Cambiar texto dinámico según selección de medida
+document.querySelectorAll('input[name="medida"]').forEach((radio) => {
+    radio.addEventListener('change', function () {
+        document.querySelectorAll('.medida').forEach((label) => {
+            label.textContent = this.value;
         });
     });
+});
+
 </script>
 
 
