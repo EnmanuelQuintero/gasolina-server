@@ -8,7 +8,7 @@
 </a>
 
 <div class="max-w-7xl mx-auto px-4 py-6">
-    <h2 class="text-2xl font-bold text-gray-800 mb-6">Entrega de Detalles para la Orden #{{ $orden->id }}</h2>
+    <h2 class="text-2xl font-bold text-gray-800 mb-6">Entrega de Detalles Banano para la Orden #{{ $orden->id }}</h2>
 
     @if(session('success'))
         <div class="bg-green-100 text-green-800 px-4 py-2 rounded mb-4">
@@ -37,11 +37,22 @@
                     @foreach($relaciones as $relacion)
                         <tr class="border-b hover:bg-gray-50">
                             <td class="px-4 py-2">
-                                @if(!$relacion->entregado)
+                                @if(!$relacion->entregado && $relacion->detalleOrden->vehiculo->estado == 'operativo')
                                     <input type="checkbox" name="detalles[]" value="{{ $relacion->id }}" class="form-checkbox h-4 w-4 text-indigo-600">
                                 @endif
                             </td>
-                            <td class="px-4 py-2">{{ $relacion->detalleOrden->vehiculo->placa ?? 'N/A' }}</td>
+                            
+                            @if($relacion->detalleOrden->vehiculo->estado == 'operativo')
+                                <td class="px-4 py-2">
+                                    {{ $relacion->detalleOrden->vehiculo->placa ?? 'N/A' }}
+                                </td>
+                            @else
+                                <td class="px-4 py-2 bg-red-200">
+                                    {{ $relacion->detalleOrden->vehiculo->placa ?? 'N/A' }} - 
+                                    Estado: {{ $relacion->detalleOrden->vehiculo->estado }}
+                                </td>
+                            @endif
+
                             <td class="px-4 py-2">{{ $relacion->detalleOrden->chofer->primer_nombre ?? 'N/A' }}</td>
                             <td class="px-4 py-2">{{ $relacion->detalleOrden->combustible->nombre ?? 'N/A' }}</td>
                             <td class="px-4 py-2">{{ $relacion->detalleOrden->cantidad }}</td>
